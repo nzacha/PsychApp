@@ -14,8 +14,8 @@ import java.util.Calendar;
 
 public class PsychApp extends Application {
     private static enum Researcher{
-        Marianna(4),
-        Penelope(5);
+        Marianna(2),
+        Penelope(1);
 
         public final int code;
 
@@ -29,7 +29,7 @@ public class PsychApp extends Application {
     }
     public static final int researcher = Researcher.Marianna.getCode();
     public static final String serverUrl = "http://10.0.2.2:5050/";
-    public static int userId = 13;
+    public static int userId = 1;
     public static PsychApp instance;
     public static Context context;
     public static String CHANNEL_ID = "PsychAppNotifications";

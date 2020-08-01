@@ -63,7 +63,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Answer the questions and press send to finish", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -103,7 +103,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 RadioGroup radioGroup = findViewById(new String("question"+question.id).hashCode());
                 int selectedId = radioGroup.getCheckedRadioButtonId();
                 RadioButton radioButton = (RadioButton) findViewById(selectedId);
-                answer = ""+radioButton.getId();
+                answer = ""+radioButton.getText();
                 break;
             default:
                 throw new InputMismatchException();
