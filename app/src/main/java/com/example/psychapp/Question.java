@@ -3,8 +3,7 @@ package com.example.psychapp;
 import org.json.JSONArray;
 
 public class Question {
-    public static final String Placeholder = "Type your answer here";
-
+    public static final int View_ID = 100;
     public Question(String question, QuestionType type, JSONArray options) {
     }
 
@@ -17,6 +16,7 @@ public class Question {
 
     public int id;
     public String question = "Placeholder Question";
+    public String answer = "";
     public QuestionType type = QuestionType.TEXT;
     public String[] options;
     public int level;

@@ -2,7 +2,10 @@ package com.example.psychapp;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -34,11 +39,11 @@ import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Map;
 
 public class QuestionnaireActivity extends AppCompatActivity {
@@ -51,7 +56,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        CollapsingToolbarLayout toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
         toolBarLayout.setTitle(getTitle());
 
         final ArrayList<Question> questions = new ArrayList<Question>();
@@ -87,22 +92,22 @@ public class QuestionnaireActivity extends AppCompatActivity {
         final RequestQueue queue = Volley.newRequestQueue(this);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + userId;
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         String answer = null;
         switch(question.type) {
             case TEXT:
-                EditText questionText = findViewById(new String("question"+question.id).hashCode());
+                EditText questionText = findViewById(R.id.quiz_question_message);
                 answer = questionText.getText().toString();
                 break;
             case SLIDER:
             case SLIDER_DISCRETE:
-                SeekBar seekbar = findViewById(new String("question"+question.id).hashCode());
+                SeekBar seekbar = findViewById(R.id.question_seekbar);
                 answer = ""+seekbar.getProgress();
                 break;
             case MULTIPLE_CHOICE:
-                RadioGroup radioGroup = findViewById(new String("question"+question.id).hashCode());
+                RadioGroup radioGroup = findViewById(R.id.choice_group);
                 int selectedId = radioGroup.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(selectedId);
+                RadioButton radioButton = findViewById(selectedId);
                 answer = ""+radioButton.getText();
                 break;
             default:
@@ -114,13 +119,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("wtf", response.toString());
                 }
             },
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //Log.d("wtf", "Error: " + error.getMessage());
                 }
             });
 
@@ -186,7 +189,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("help", error.getLocalizedMessage());
                     }
                 }
         );
@@ -202,46 +204,52 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent){
-            Question question = getItem(position);
+            final Question question = getItem(position);
 
-            if (convertView == null) {
+            //if(convertView == null){
                 switch(question.type) {
                     case TEXT:
                         convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question, parent, false);
-                        TextView message = convertView.findViewById(R.id.quiz_question_message);
-                        message.setId(new String("question"+question.id).hashCode());
-                        message.setText(Question.Placeholder);
+                        EditText message = convertView.findViewById(R.id.quiz_question_message);
+                        message.addTextChangedListener(new TextWatcher() {
+                            public void afterTextChanged(Editable s) {
+                                question.answer = s.toString();
+                            }
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                        });
+                        message.setText(question.answer);
                         break;
                     case SLIDER:
                         convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider, parent, false);
                         SeekBar continuousSeekBar = convertView.findViewById(R.id.question_seekbar);
-                        continuousSeekBar.setId(new String("question"+question.id).hashCode());
                         continuousSeekBar.setMax(100);
                         continuousSeekBar.setProgress(0);
                         break;
                     case SLIDER_DISCRETE:
                         convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
                         SeekBar discreteSeekBar = convertView.findViewById(R.id.question_seekbar);
-                        discreteSeekBar.setId(new String("question"+question.id).hashCode());
                         discreteSeekBar.setMax(question.level-1);
                         discreteSeekBar.setProgress(0);
                         break;
                     case MULTIPLE_CHOICE:
                         convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
                         RadioGroup optionsGroup = convertView.findViewById(R.id.choice_group);
-                        optionsGroup.setId(new String("question"+question.id).hashCode());
                         for(int i=0; i < question.options.length; i++){
                             RadioButton newButton = new RadioButton( getContext());
                             newButton.setText(question.options[i]);
-                            newButton.setId(i);
                             optionsGroup.addView(newButton);
                         }
-                        optionsGroup.check(0);
+                        optionsGroup.check(optionsGroup.getChildAt(0).getId());
                         break;
                     default:
                         throw new InputMismatchException();
                 }
-            }
+
+//            } else {
+//
+//            }
+
             TextView title = convertView.findViewById(R.id.quiz_question_title);
             title.setText(question.question);
             return convertView;
