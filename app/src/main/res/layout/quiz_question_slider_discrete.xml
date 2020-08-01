@@ -15,14 +15,12 @@
         android:text="title"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-    <EditText
-        android:id="@+id/quiz_question_message"
+    <SeekBar
+        android:id="@+id/question_seekbar"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"
-        android:text="message"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:max="4"
+        android:progress="0" />
 
 </LinearLayout>
