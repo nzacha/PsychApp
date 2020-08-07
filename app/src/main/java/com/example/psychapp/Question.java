@@ -2,6 +2,8 @@ package com.example.psychapp;
 
 import org.json.JSONArray;
 
+import static com.example.psychapp.Question.QuestionType.*;
+
 public class Question {
     public static final int View_ID = 100;
     public Question(String question, QuestionType type, JSONArray options) {
@@ -17,7 +19,7 @@ public class Question {
     public int id;
     public String question = "Placeholder Question";
     public String answer = "";
-    public QuestionType type = QuestionType.TEXT;
+    public QuestionType type = TEXT;
     public String[] options;
     public int level;
 
@@ -31,7 +33,7 @@ public class Question {
     public Question(int id, String question, String[] options){
         this.id = id;
         this.question = question;
-        this.type = QuestionType.MULTIPLE_CHOICE;
+        this.type = MULTIPLE_CHOICE;
         this.options = options;
     }
 

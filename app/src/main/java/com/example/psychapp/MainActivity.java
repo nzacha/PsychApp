@@ -30,7 +30,5 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-        PsychApp.context = this;
     }
 }

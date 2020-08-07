@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +19,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -39,7 +35,6 @@ import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +79,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             }
         });
 
-        retrieveQuestionsFromServer(questions, PsychApp.researcher);
+        retrieveQuestionsFromServer(questions, PsychApp.researcherId);
     }
 
     private void sendAnswerToServer(Question question, int userId){
