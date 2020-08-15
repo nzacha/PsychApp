@@ -9,6 +9,7 @@ import android.os.SystemClock;
 
 import com.example.psychapp.MainActivity;
 import com.example.psychapp.R;
+import com.example.psychapp.ui.login.ConsentActivity;
 import com.example.psychapp.ui.login.LoginActivity;
 
 public class LogoActivity extends AppCompatActivity {

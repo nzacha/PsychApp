@@ -52,7 +52,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
-        toolBarLayout.setTitle(getTitle());
+        //toolBarLayout.setTitle(getTitle());
 
         final ArrayList<Question> questions = new ArrayList<Question>();
         QuizAdapter adapter = new QuizAdapter(this, questions);
