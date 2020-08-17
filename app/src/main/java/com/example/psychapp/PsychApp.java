@@ -21,6 +21,7 @@ import java.util.Calendar;
 public class PsychApp extends Application {;
     public static final String serverUrl = "http://10.0.2.2:5050/";
     public static Integer researcherId = LoginActivity.CODE_UNAVAILABLE, userId = LoginActivity.CODE_UNAVAILABLE;
+    public static Integer NUMBER_OF_ALARMS = 2;
 
     public static PsychApp instance;
     public static Context context;
@@ -35,17 +36,12 @@ public class PsychApp extends Application {;
         createNotificationChannel();
     }
 
-    public void shceduleBackgroundService(Calendar calendar){
-        /*
-        Intent serviceintent = new Intent(context, ReminderService.class);
-        context.startService(serviceintent);
-        */
-
+    public void scheduleDailyNotification(Calendar calendar, int requestCode){
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent alarmIntent = new Intent(this, NotificationReceiver.class);
         alarmIntent.setAction("alarm");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 89467, alarmIntent, 0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis() + 1000 * 10, AlarmManager.INTERVAL_DAY, pendingIntent);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
         Log.d("wtf","Alarm`set");
     }

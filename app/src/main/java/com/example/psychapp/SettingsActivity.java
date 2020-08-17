@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -15,13 +16,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.psychapp.ui.login.LoginActivity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class SettingsActivity extends AppCompatActivity {
-    public static int hour = 12, minutes = 00;
+    public static int DEFAULT_HOUR = 12, DEFAULT_MINUTES = 00;
+    public ArrayList<Integer> hours = new ArrayList<Integer>();
+    public ArrayList<Integer> minutes = new ArrayList<Integer>();
 
     private TimePicker datePicker;
-    private TextView notificationTime;
+    private TextView notificationLabel, notificationTime;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -34,28 +38,30 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         datePicker = findViewById(R.id.notificationTimePicker);
-        datePicker.setHour(hour);
-        datePicker.setMinute(minutes);
+        notificationLabel = findViewById(R.id.notification_label);
+        notificationTime = findViewById(R.id.notification_time);
 
-        notificationTime = findViewById(R.id.notificationTime);
-        notificationTime.setText(String.format("%02d:%02d", hour, minutes));
+        datePicker.setHour(DEFAULT_HOUR);
+        datePicker.setMinute(DEFAULT_MINUTES);
+
+        notificationTime.setText(String.format("%02d:%02d", DEFAULT_HOUR, DEFAULT_MINUTES));
 
         Button notificationTimeButton = findViewById(R.id.notificationTimeButton);
         notificationTimeButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
-                hour = datePicker.getHour();
-                minutes = datePicker.getMinute();
+                DEFAULT_HOUR = datePicker.getHour();
+                DEFAULT_MINUTES = datePicker.getMinute();
 
-                notificationTime.setText(String.format("%02d:%02d", hour, minutes));
+                notificationTime.setText(String.format("%02d:%02d", DEFAULT_HOUR, DEFAULT_MINUTES));
 
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(System.currentTimeMillis());
-                calendar.set(Calendar.HOUR_OF_DAY, hour);
-                calendar.set(Calendar.MINUTE, minutes);
+                calendar.set(Calendar.HOUR_OF_DAY, DEFAULT_HOUR);
+                calendar.set(Calendar.MINUTE, DEFAULT_MINUTES);
 
-                PsychApp.instance.shceduleBackgroundService(calendar);
+                PsychApp.instance.scheduleDailyNotification(calendar, 51421);
                 //PsychApp.instance.scheduleDailyNotification(calendar);
                 Log.i("Notification","reminder set for "+calendar);
                 finish();
@@ -80,14 +86,14 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putInt("hour", hour);
-        savedInstanceState.putInt("minutes", minutes);
+        savedInstanceState.putInt("hour", DEFAULT_HOUR);
+        savedInstanceState.putInt("minutes", DEFAULT_MINUTES);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        hour = savedInstanceState.getInt("hour");
-        minutes = savedInstanceState.getInt("minutes");
+        //hour = savedInstanceState.getInt("hour");
+        //minute = savedInstanceState.getInt("minutes");
     }
 }
