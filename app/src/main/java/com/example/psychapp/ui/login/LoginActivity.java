@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,8 +20,10 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.psychapp.MainActivity;
 import com.example.psychapp.PsychApp;
+import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.data.model.LoggedInUser;
+import com.example.psychapp.ui.ConsentActivity;
 
 public class LoginActivity extends AppCompatActivity {
     public static final Integer CODE_UNAVAILABLE= -1;
@@ -49,12 +50,9 @@ public class LoginActivity extends AppCompatActivity {
 
         //user exists
         if(code != CODE_UNAVAILABLE){
-            PsychApp.userId = code;
-            String name = sharedPreferences.getString("login_name","user");
-            Integer researcherId = sharedPreferences.getInt("login_researcherId", -1);
-            PsychApp.researcherId = researcherId;
+            loadUserData();
 
-            updateUiWithUser(new LoggedInUser(code, name, researcherId), false);
+            updateUiWithUser(new LoggedInUser(PsychApp.userId, PsychApp.user_name,  PsychApp.researcherId), false);
             setResult(Activity.RESULT_OK);
             finish();
             return;
@@ -131,9 +129,17 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 loginViewModel.setCode(codeEditText.getText().toString());
-                LoginBackgroundTask loginTAsk = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
+                LoginBackgroundTask loginTask = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
             }
         });
+    }
+
+    public static void loadUserData(){
+        SharedPreferences sharedPreferences = PsychApp.context.getSharedPreferences(LOGIN_INFO, MODE_PRIVATE);
+
+        PsychApp.userId = sharedPreferences.getInt("login_code", CODE_UNAVAILABLE);
+        PsychApp.user_name = sharedPreferences.getString("login_name","user");
+        PsychApp.researcherId = sharedPreferences.getInt("login_researcherId", -1);
     }
 
     public void startNextActivity(boolean showConsent){
@@ -152,12 +158,12 @@ public class LoginActivity extends AppCompatActivity {
         String welcome;
         if(model.getDisplayName() == null) {
             welcome = "Welcome!";
-        }else{
+        } else {
             welcome = "Welcome " + model.getDisplayName() + "!";
         }
-        // TODO : initiate successful logged in experience
-        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+        QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getResearcherId());
 
+        Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         startNextActivity(showConsent);
     }
 

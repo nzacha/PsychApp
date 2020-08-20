@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tab_account">Λογαριασμός</string>
+    <string name="messages_header">Μυνήματα</string>
+    <string name="tab_notification">Ειδοποιήσεις</string>
+    <string name="welcome">Καλωσόρισες !</string>
+    <string name="action_sign_in_short">Σύνδεση</string>
+    <string name="prompt_password">Κωδικός</string>
+    <string name="prompt_email">Email</string>
+    <string name="consent_text">Σε συνέχεια της συγκατάθεσης που έδωσα προηγουμένως στην κύρια ερευνήτρια, συμφωνώ για τη συλλογή δεδομένων στη διάρκεια της καθημερινότητάς μου μέσω αυτής της εφαρμογής.   Επιβεβαιώνω ότι έχω κατανοήσει τις πληροφορίες, είχα την ευκαιρία να ρωτήσω ερωτήσεις και μου δόθηκαν ικανοποιητικές απαντήσεις.   Κατανοώ ότι μπορώ να αποσυρθώ από το πρόγραμμα όποτε θέλω, χωρίς να υπάρχουν οποιεσδήποτε επιπτώσεις σε εμένα.</string>
+    <string name="login_failed">Αποτυχία σύνδεσης</string>
+    <string name="invalid_username">Λάθος όνομα</string>
+    <string name="invalid_password">Λάθος κωδικός</string>
+</resources>

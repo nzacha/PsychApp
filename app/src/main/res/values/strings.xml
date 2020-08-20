@@ -1,9 +1,8 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PsychApp</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="tab_application">Application</string>
-    <string name="tab_notification">Notifications</string>
     <string name="tab_account">Account</string>
     <string name="title_activity_settings">SettingsActivity</string>
 
@@ -21,8 +20,8 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="channel_name">quiiz_reminder</string>
-    <string name="channel_description">questionaire reminder notifications</string>
+    <string name="channel_name">quiz_reminder</string>
+    <string name="channel_description">questionnaire reminder notifications</string>
     <string name="title_activity_questionnaire">ScrollingActivity</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
@@ -125,9 +124,6 @@
     <string name="login_failed">"Login failed"</string>
     <string name="title_activity_settings_tabbed">SettingsTabbedActivity</string>
     <string name="title_activity_consent">ScrollingActivity</string>
-    <string name="consent_text">Σε συνέχεια της συγκατάθεσης που έδωσα προηγουμένως στην κύρια ερευνήτρια,
-συμφωνώ για τη συλλογή δεδομένων στη διάρκεια της καθημερινότητάς μου μέσω
-αυτής της εφαρμογής. \n\nΕπιβεβαιώνω ότι έχω κατανοήσει τις πληροφορίες, είχα την ευκαιρία
-να ρωτήσω ερωτήσεις και μου δόθηκαν ικανοποιητικές απαντήσεις. \n\nΚατανοώ ότι μπορώ
-να αποσυρθώ από το πρόγραμμα όποτε θέλω, χωρίς να υπάρχουν οποιεσδήποτε επιπτώσεις σε εμένα.</string>
+    <string name="consent_text">Σε συνέχεια της συγκατάθεσης που έδωσα προηγουμένως στην κύρια ερευνήτρια, συμφωνώ για τη συλλογή δεδομένων στη διάρκεια της καθημερινότητάς μου μέσω αυτής της εφαρμογής.   Επιβεβαιώνω ότι έχω κατανοήσει τις πληροφορίες, είχα την ευκαιρία να ρωτήσω ερωτήσεις και μου δόθηκαν ικανοποιητικές απαντήσεις.   Κατανοώ ότι μπορώ να αποσυρθώ από το πρόγραμμα όποτε θέλω, χωρίς να υπάρχουν οποιεσδήποτε επιπτώσεις σε εμένα.</string>
+    <string name="tab_notification">Notifications</string>
 </resources>

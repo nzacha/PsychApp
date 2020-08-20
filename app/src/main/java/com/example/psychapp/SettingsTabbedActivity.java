@@ -32,9 +32,9 @@ public class SettingsTabbedActivity extends AppCompatActivity {
         CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
         //toolBarLayout.setTitle(getTitle());
 
-        SettingsPagerAdapter sectionsPagerAdapter = new SettingsPagerAdapter(this, getSupportFragmentManager());
+        SettingsPagerAdapter settingsPagerAdapter = new SettingsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
-        viewPager.setAdapter(sectionsPagerAdapter);
+        viewPager.setAdapter(settingsPagerAdapter);
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
     }

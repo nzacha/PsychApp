@@ -5,11 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 
-import com.example.psychapp.MainActivity;
 import com.example.psychapp.R;
-import com.example.psychapp.ui.login.ConsentActivity;
 import com.example.psychapp.ui.login.LoginActivity;
 
 public class LogoActivity extends AppCompatActivity {

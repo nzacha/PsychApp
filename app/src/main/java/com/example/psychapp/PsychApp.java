@@ -18,8 +18,10 @@ import com.example.psychapp.ui.login.LoginActivity;
 
 import java.util.Calendar;
 
-public class PsychApp extends Application {;
+public class PsychApp extends Application {
+    //public static final String serverUrl = "http://192.168.0.16:5050/";
     public static final String serverUrl = "http://10.0.2.2:5050/";
+    public static String user_name = "";
     public static Integer researcherId = LoginActivity.CODE_UNAVAILABLE, userId = LoginActivity.CODE_UNAVAILABLE;
     public static Integer NUMBER_OF_ALARMS = 2;
 
@@ -43,7 +45,7 @@ public class PsychApp extends Application {;
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
-        Log.d("wtf","Alarm`set");
+        Log.d("wtf","Alarm set");
     }
 
     private void createNotificationChannel() {
@@ -55,6 +57,7 @@ public class PsychApp extends Application {;
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "250215554144",
+    "firebase_url": "https://psychapp-4f498.firebaseio.com",
+    "project_id": "psychapp-4f498",
+    "storage_bucket": "psychapp-4f498.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250215554144:android:f06fff587162ce8ca5b705",
+        "android_client_info": {
+          "package_name": "com.example.psychapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "250215554144-c8og0jdu8d5srfm98cknh0ime8jk38f5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsMDKyXAM4e8Y2JOg5DuKELFnf6Muwk7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "250215554144-c8og0jdu8d5srfm98cknh0ime8jk38f5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -7,7 +7,6 @@ import com.example.psychapp.data.model.LoggedInUser;
  * maintains an in-memory cache of login status and user credentials information.
  */
 public class LoginRepository {
-
     private static volatile LoginRepository instance;
 
     private LoginDataSource dataSource;

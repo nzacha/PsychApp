@@ -2,9 +2,11 @@ package com.example.psychapp;
 
 import org.json.JSONArray;
 
+import java.io.Serializable;
+
 import static com.example.psychapp.Question.QuestionType.*;
 
-public class Question {
+public class Question implements Serializable {
     public static final int View_ID = 100;
     public Question(String question, QuestionType type, JSONArray options) {
     }

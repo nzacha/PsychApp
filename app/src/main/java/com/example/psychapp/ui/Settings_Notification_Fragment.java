@@ -33,7 +33,7 @@ import java.util.InputMismatchException;
 
 public class Settings_Notification_Fragment extends Fragment {
     private static final String Settings_State = "settings_Stae";
-    public static int DEFAULT_HOUR = 8, DEFAULT_MINUTES = 0;
+    public static int DEFAULT_HOUR = 8, DEFAULT_MINUTES = 0, MINIMUM_HOUR = 4, MAXIMUM_HOUR = 22;
     public ArrayList<Integer> hours = new ArrayList<Integer>();
     public ArrayList<Integer> minutes = new ArrayList<Integer>();
 
@@ -50,7 +50,7 @@ public class Settings_Notification_Fragment extends Fragment {
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
         for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
-            Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + 6);
+            Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + (4 * i));
             Integer minute = sharedPreferences.getInt("minute_value_" + i, DEFAULT_MINUTES);
             hours.add(hour);
             minutes.add(minute);
@@ -58,6 +58,7 @@ public class Settings_Notification_Fragment extends Fragment {
 
         datePicker = root.findViewById(R.id.notificationTimePicker);
         final NumberPicker hourSpinner = (NumberPicker) datePicker.findViewById(Resources.getSystem().getIdentifier("hour", "id", "android"));
+        hourSpinner.setWrapSelectorWheel(false);
         NumberPicker minuteSpinner = (NumberPicker) datePicker.findViewById(Resources.getSystem().getIdentifier("minute", "id", "android"));
         minuteSpinner.setMaxValue(3);
         minuteSpinner.setMinValue(0);
@@ -92,7 +93,7 @@ public class Settings_Notification_Fragment extends Fragment {
 
                     PsychApp.instance.scheduleDailyNotification(calendar, 2612);
 
-                    Log.i("Notification","reminder set for "+calendar);
+                    Log.d("Notification","reminder set for "+calendar);
                     getActivity().finish();
                 }
             });
@@ -110,7 +111,7 @@ public class Settings_Notification_Fragment extends Fragment {
             Integer hour = Integer.parseInt(radio.getText().toString().split(":")[0]);
             Integer minute = Integer.parseInt(radio.getText().toString().split(":")[1]);
             datePicker.setHour(hour);
-            datePicker.setMinute(minute * MINUTE_INTERVAL);
+            datePicker.setMinute(minute / MINUTE_INTERVAL);
             datePicker.setIs24HourView(true);
 
             notificationTimes.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -124,12 +125,18 @@ public class Settings_Notification_Fragment extends Fragment {
                     hourMax = hour;
 
                     RadioButton tempRadio;
-                    if(index > 0){
-                        tempRadio = (RadioButton) radioGroup.getChildAt(index-1);
+                    if (index == 0) {
+                        tempRadio = (RadioButton) radioGroup.getChildAt(index + 1);
+                        hourMin = MINIMUM_HOUR;
+                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - 3;
+                    } else if (index == PsychApp.NUMBER_OF_ALARMS -1) {
+                        tempRadio = (RadioButton) radioGroup.getChildAt(index -1);
                         hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + 3;
-                    }
-                    if(index < PsychApp.NUMBER_OF_ALARMS-1){
-                        tempRadio = (RadioButton) radioGroup.getChildAt(index+1);
+                        hourMax = MAXIMUM_HOUR;
+                    } else {
+                        tempRadio = (RadioButton) radioGroup.getChildAt(index -1);
+                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + 3;
+                        tempRadio = (RadioButton) radioGroup.getChildAt(index +1);
                         hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - 3;
                     }
 
@@ -137,7 +144,7 @@ public class Settings_Notification_Fragment extends Fragment {
                     hourSpinner.setMaxValue(hourMax);
 
                     datePicker.setHour(hour);
-                    datePicker.setMinute(minutes * MINUTE_INTERVAL);
+                    datePicker.setMinute(minutes / MINUTE_INTERVAL);
                 }
             });
 
@@ -174,7 +181,7 @@ public class Settings_Notification_Fragment extends Fragment {
 
                         PsychApp.instance.scheduleDailyNotification(calendar, 2612 + i);
 
-                        Log.i("Notification","reminder set for " + calendar);
+                        Log.d("Notification","reminder set for " + calendar);
                     }
                     getActivity().finish();
                 }

@@ -1,10 +1,14 @@
 package com.example.psychapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -15,6 +19,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +32,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.ExitActivity;
 import com.example.psychapp.Question.QuestionType;
+import com.example.psychapp.ui.login.LoginActivity;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,12 +43,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
 
+import static com.example.psychapp.PsychApp.context;
+
 public class QuestionnaireActivity extends AppCompatActivity {
+    private static ArrayList<Question> questions = new ArrayList<Question>();
+    private static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,13 +67,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
+        //CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
         //toolBarLayout.setTitle(getTitle());
-
-        final ArrayList<Question> questions = new ArrayList<Question>();
-        QuizAdapter adapter = new QuizAdapter(this, questions);
-        ListView quizQuestionList = findViewById(R.id.quiz_question_list);
-        quizQuestionList.setAdapter(adapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,12 +85,18 @@ public class QuestionnaireActivity extends AppCompatActivity {
             public void onClick(View view) {
                 for(Question question: questions) {
                     sendAnswerToServer(question, PsychApp.userId);
-                    finish();
                 }
+                clearQuestions();
+                ExitActivity.exitApplication(PsychApp.context);
             }
         });
 
-        retrieveQuestionsFromServer(questions, PsychApp.researcherId);
+        if(PsychApp.userId == LoginActivity.CODE_UNAVAILABLE)
+            LoginActivity.loadUserData();
+        retrieveQuestions(this, PsychApp.researcherId);
+        QuizAdapter adapter = new QuizAdapter(this, questions);
+        ListView quizQuestionList = findViewById(R.id.quiz_question_list);
+        quizQuestionList.setAdapter(adapter);
     }
 
     private void sendAnswerToServer(Question question, int userId){
@@ -126,9 +143,24 @@ public class QuestionnaireActivity extends AppCompatActivity {
         queue.add(postRequest);
     }
 
-    private void retrieveQuestionsFromServer(final ArrayList<Question> questions, int researcherId){
+    public static void retrieveQuestions(Context context, int researcherId){
+        if(isNetworkConnected(context)){
+            retrieveQuestionsFromServer(context, researcherId);
+        } else {
+            Log.d("wtf","Internet connection not available");
+            try {
+                loadQuestions();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void retrieveQuestionsFromServer(Context context, int researcherId){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(this);
+        final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "questions/" + researcherId;
 
         // prepare the Request
@@ -178,10 +210,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                 questions.add(new Question(id, question, QuestionType.TEXT));
                             }
                         }
+                        try {
+                            saveQuestions();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 },
-                new Response.ErrorListener()
-                {
+                new Response.ErrorListener(){
                     @Override
                     public void onErrorResponse(VolleyError error) {
                     }
@@ -190,6 +226,58 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
         // add it to the RequestQueue
         queue.add(getRequest);
+    }
+
+    private static void saveQuestions() throws IOException {
+        FileOutputStream fos = context.openFileOutput(QUESTIONS, Context.MODE_PRIVATE);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(questions);
+        os.close();
+        fos.close();
+        Log.d("wtf", "Questions saved on Phone");
+    }
+
+    private static void loadQuestions() throws IOException, ClassNotFoundException {
+        FileInputStream fis = context.openFileInput(QUESTIONS);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        questions = (ArrayList<Question>) is.readObject();
+        is.close();
+        fis.close();
+        Log.d("wtf", "Questions loaded from Phone");
+    }
+
+
+    public static void clearQuestions(){
+        questions.clear();
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("status", false);
+        editor.apply();
+
+        try {
+            saveQuestions();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void enable(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("status", true);
+        editor.commit();
+        editor.apply();
+    }
+
+    public static boolean isActive(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("status", false);
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (cm.getActiveNetworkInfo() != null) && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     class QuizAdapter extends ArrayAdapter<Question>{
@@ -201,49 +289,89 @@ public class QuestionnaireActivity extends AppCompatActivity {
         public View getView(int position, View convertView, @NonNull ViewGroup parent){
             final Question question = getItem(position);
 
-            //if(convertView == null){
-                switch(question.type) {
-                    case TEXT:
-                        convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question, parent, false);
-                        EditText message = convertView.findViewById(R.id.quiz_question_message);
-                        message.addTextChangedListener(new TextWatcher() {
-                            public void afterTextChanged(Editable s) {
-                                question.answer = s.toString();
-                            }
-                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                        });
-                        message.setText(question.answer);
-                        break;
-                    case SLIDER:
-                        convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider, parent, false);
-                        SeekBar continuousSeekBar = convertView.findViewById(R.id.question_seekbar);
-                        continuousSeekBar.setMax(100);
-                        continuousSeekBar.setProgress(0);
-                        break;
-                    case SLIDER_DISCRETE:
-                        convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
-                        SeekBar discreteSeekBar = convertView.findViewById(R.id.question_seekbar);
-                        discreteSeekBar.setMax(question.level-1);
-                        discreteSeekBar.setProgress(0);
-                        break;
-                    case MULTIPLE_CHOICE:
-                        convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
-                        RadioGroup optionsGroup = convertView.findViewById(R.id.choice_group);
-                        for(int i=0; i < question.options.length; i++){
-                            RadioButton newButton = new RadioButton( getContext());
-                            newButton.setText(question.options[i]);
-                            optionsGroup.addView(newButton);
+            switch(question.type) {
+                case TEXT:
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question, parent, false);
+                    EditText message = convertView.findViewById(R.id.quiz_question_message);
+                    message.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            question.answer = s.toString();
                         }
-                        optionsGroup.check(optionsGroup.getChildAt(0).getId());
-                        break;
-                    default:
-                        throw new InputMismatchException();
-                }
-
-//            } else {
-//
-//            }
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                    });
+                    message.setText(question.answer);
+                    break;
+                case SLIDER:
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider, parent, false);
+                    SeekBar continuousSeekBar = convertView.findViewById(R.id.question_seekbar);
+                    continuousSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                            question.answer = ""+i;
+                        }
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {}
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                    });
+                    continuousSeekBar.setMax(100);
+                    try {
+                        continuousSeekBar.setProgress(Integer.parseInt(question.answer));
+                    } catch (NumberFormatException nfe) {
+                        question.answer = "" + 0;
+                        continuousSeekBar.setProgress(Integer.parseInt(question.answer));
+                    }
+                    break;
+                case SLIDER_DISCRETE:
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
+                    SeekBar discreteSeekBar = convertView.findViewById(R.id.question_seekbar);
+                    discreteSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                        @Override
+                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                            question.answer = ""+i;
+                        }
+                        @Override
+                        public void onStartTrackingTouch(SeekBar seekBar) {}
+                        @Override
+                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                    });
+                    discreteSeekBar.setMax(question.level-1);
+                    try {
+                        discreteSeekBar.setProgress(Integer.parseInt(question.answer));
+                    } catch (NumberFormatException nfe) {
+                        question.answer = "" + 0;
+                        discreteSeekBar.setProgress(Integer.parseInt(question.answer));
+                    }
+                    break;
+                case MULTIPLE_CHOICE:
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
+                    RadioGroup optionsGroup = convertView.findViewById(R.id.choice_group);
+                    optionsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                            RadioButton radio = radioGroup.findViewById(i);
+                            question.answer = "" + radioGroup.indexOfChild(radio);
+                        }
+                    });
+                    for(int i=0; i < question.options.length; i++){
+                        RadioButton newButton = new RadioButton( getContext());
+                        newButton.setText(question.options[i]);
+                        optionsGroup.addView(newButton);
+                    }
+                    try {
+                        optionsGroup.check(optionsGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+                    } catch (NumberFormatException nfe) {
+                        question.answer = "" + 0;
+                        optionsGroup.check(optionsGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+                    }
+                    break;
+                default:
+                    throw new InputMismatchException();
+            }
 
             TextView title = convertView.findViewById(R.id.quiz_question_title);
             title.setText(question.question);

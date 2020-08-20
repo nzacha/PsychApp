@@ -23,7 +23,7 @@ import java.util.InputMismatchException;
 public class SettingsPagerAdapter extends FragmentPagerAdapter {
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_application, R.string.tab_notification, R.string.tab_account};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_notification, R.string.tab_account};
     private final Context mContext;
 
     public SettingsPagerAdapter(Context context, FragmentManager fm) {
@@ -35,10 +35,8 @@ public class SettingsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new Settings_Application_Fragment();
-            case 1:
                 return new Settings_Notification_Fragment();
-            case 2:
+            case 1:
                 return new Settings_Account_Fragment();
             default:
                 throw new InputMismatchException();
@@ -53,7 +51,6 @@ public class SettingsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 2 total pages.
-        return 3;
+        return TAB_TITLES.length;
     }
 }
