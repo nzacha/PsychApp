@@ -19,7 +19,8 @@ import com.example.psychapp.ui.login.LoginActivity;
 import java.util.Calendar;
 
 public class PsychApp extends Application {
-    //public static final String serverUrl = "http://192.168.0.16:5050/";
+    //public static final String serverUrl = "http://192.168.0.17:5050/";
+    //public static final String serverUrl = "http://172.20.10.5:5050/";
     public static final String serverUrl = "http://10.0.2.2:5050/";
     public static String user_name = "";
     public static Integer researcherId = LoginActivity.CODE_UNAVAILABLE, userId = LoginActivity.CODE_UNAVAILABLE;

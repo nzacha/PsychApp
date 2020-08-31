@@ -155,12 +155,8 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUiWithUser(LoggedInUser model, boolean showConsent) {
         PsychApp.userId = model.getUserId();
         PsychApp.researcherId = model.getResearcherId();
-        String welcome;
-        if(model.getDisplayName() == null) {
-            welcome = "Welcome!";
-        } else {
-            welcome = "Welcome " + model.getDisplayName() + "!";
-        }
+        String welcome = "Welcome " + model.getDisplayName() + "!";
+
         QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getResearcherId());
 
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
