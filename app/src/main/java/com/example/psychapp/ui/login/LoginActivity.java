@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.example.psychapp.IntroductionActivity;
 import com.example.psychapp.MainActivity;
 import com.example.psychapp.PsychApp;
 import com.example.psychapp.QuestionnaireActivity;
@@ -85,10 +86,6 @@ public class LoginActivity extends AppCompatActivity {
                     LoggedInUser user = loginResult.getSuccess();
                     storeUserInfo(user);
                     updateUiWithUser(user, true);
-
-                    //Complete and destroy login activity once successful
-                    setResult(Activity.RESULT_OK);
-                    finish();
                 }
             }
         });
@@ -145,7 +142,8 @@ public class LoginActivity extends AppCompatActivity {
     public void startNextActivity(boolean showConsent){
         Intent intent;
         if(showConsent) {
-            intent = new Intent(this, ConsentActivity.class);
+            intent = new Intent(this, IntroductionActivity.class);
+            intent.putExtra("new_user", true);
         }else{
             intent = new Intent(this, MainActivity.class);
         }
@@ -155,12 +153,17 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUiWithUser(LoggedInUser model, boolean showConsent) {
         PsychApp.userId = model.getUserId();
         PsychApp.researcherId = model.getResearcherId();
-        String welcome = "Welcome " + model.getDisplayName() + "!";
+        //String welcome = "Welcome " + model.getDisplayName() + "!";
+        String welcome = "Welcome!";
 
         QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getResearcherId());
 
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         startNextActivity(showConsent);
+
+        //Complete and destroy login activity once successful
+        setResult(Activity.RESULT_OK);
+        finish();
     }
 
     private void showLoginFailed(@StringRes Integer errorString) {

@@ -36,51 +36,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        datePicker = findViewById(R.id.notificationTimePicker);
-        notificationLabel = findViewById(R.id.notification_label);
-        notificationTime = findViewById(R.id.notification_time);
-
-        datePicker.setHour(DEFAULT_HOUR);
-        datePicker.setMinute(DEFAULT_MINUTES);
-
-        notificationTime.setText(String.format("%02d:%02d", DEFAULT_HOUR, DEFAULT_MINUTES));
-
-        Button notificationTimeButton = findViewById(R.id.notificationTimeButton);
-        notificationTimeButton.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View view) {
-                DEFAULT_HOUR = datePicker.getHour();
-                DEFAULT_MINUTES = datePicker.getMinute();
-
-                notificationTime.setText(String.format("%02d:%02d", DEFAULT_HOUR, DEFAULT_MINUTES));
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(System.currentTimeMillis());
-                calendar.set(Calendar.HOUR_OF_DAY, DEFAULT_HOUR);
-                calendar.set(Calendar.MINUTE, DEFAULT_MINUTES);
-
-                PsychApp.instance.scheduleDailyNotification(calendar, 51421);
-                //PsychApp.instance.scheduleDailyNotification(calendar);
-                Log.i("Notification","reminder set for "+calendar);
-                finish();
-            }
-        });
-
-        Button logoutButton = findViewById(R.id.logout_button);
-        logoutButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.LOGIN_INFO, MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("login_code");
-                editor.remove("login_name");
-                editor.remove("login_researcherId");
-                editor.apply();
-                finishAffinity();
-            }
-        });
     }
 
     @Override

@@ -67,8 +67,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //CollapsingToolbarLayout toolBarLayout = findViewById(R.id.toolbar_layout);
-        //toolBarLayout.setTitle(getTitle());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +91,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
         if(PsychApp.userId == LoginActivity.CODE_UNAVAILABLE)
             LoginActivity.loadUserData();
+        Log.d("wtf",questions.toString());
         retrieveQuestions(this, PsychApp.researcherId);
         QuizAdapter adapter = new QuizAdapter(this, questions);
         ListView quizQuestionList = findViewById(R.id.quiz_question_list);
@@ -168,6 +167,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 new Response.Listener<JSONArray>(){
                     @Override
                     public void onResponse(JSONArray response) {
+                        questions.clear();
                         for( int i=0; i< response.length(); i++){
                             int id = -1;
                             String  question = null;
@@ -200,8 +200,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                 questions.add(new Question(id, question, optionsList));
                             }//sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
-                                if(level == 1) {
-                                    questions.add(new Question(id, question, QuestionType.SLIDER, level));
+                                if(level==0) {
+                                    questions.add(new Question(id, question, QuestionType.SLIDER, 0));
                                 }else{
                                     questions.add(new Question(id, question, QuestionType.SLIDER_DISCRETE, level));
                                 }

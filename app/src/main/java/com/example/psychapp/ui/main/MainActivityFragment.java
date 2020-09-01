@@ -2,23 +2,20 @@ package com.example.psychapp.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.ExitActivity;
-import com.example.psychapp.PsychApp;
+import com.example.psychapp.IntroductionActivity;
 import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.SettingsTabbedActivity;
 import com.example.psychapp.ui.ConsentActivity;
-import com.example.psychapp.ui.login.LoginActivity;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -44,7 +41,7 @@ public class MainActivityFragment extends Fragment {
         introduction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
-                openConsentActivity();
+                openIntroductionActivity();
             }
         });
 
@@ -76,8 +73,8 @@ public class MainActivityFragment extends Fragment {
         return root;
     }
 
-    public void openConsentActivity(){
-        Intent intent = new Intent(getActivity(), ConsentActivity.class);
+    public void openIntroductionActivity(){
+        Intent intent = new Intent(getActivity(), IntroductionActivity.class);
         startActivity(intent);
     }
 

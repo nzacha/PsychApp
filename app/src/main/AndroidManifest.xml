@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
@@ -16,18 +15,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".StartupNotificationActivity"></activity>
+        <activity
+            android:name=".IntroductionActivity"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name="com.example.ExitActivity"
-            android:theme="@android:style/Theme.NoDisplay"
-            android:autoRemoveFromRecents="true"/>
+            android:autoRemoveFromRecents="true"
+            android:theme="@android:style/Theme.NoDisplay" />
         <activity
             android:name=".ui.ConsentActivity"
-            android:label="Consent"></activity>
+            android:label="Consent" />
         <activity android:name=".ui.Settings_Notification_Fragment" />
         <activity
             android:name=".SettingsTabbedActivity"
             android:label="Settings"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".ui.LogoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,14 +44,14 @@
         <activity
             android:name=".QuestionnaireActivity"
             android:label="Short Questions"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name" />
 
         <service
             android:name=".ReminderService"

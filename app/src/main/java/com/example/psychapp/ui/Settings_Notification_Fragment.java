@@ -20,6 +20,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
@@ -43,11 +44,11 @@ public class Settings_Notification_Fragment extends Fragment {
     private RadioGroup notificationTimes;
 
     private static final int MINUTE_INTERVAL = 15;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.settings_notification_fragment, container, false);
-
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
         for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
             Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + (4 * i));

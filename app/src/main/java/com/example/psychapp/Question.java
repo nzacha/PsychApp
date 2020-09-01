@@ -48,6 +48,6 @@ public class Question implements Serializable {
     }
 
     public String toString(){
-        return question+": "+type.name();
+        return id+") "+question+": "+type.name()+":"+level;
     }
 }
