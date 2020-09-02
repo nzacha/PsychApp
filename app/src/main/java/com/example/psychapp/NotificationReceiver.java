@@ -25,15 +25,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             sendNotification(context, intent);
             Log.d("wtf","Sending Notification");
         }
-        /*
-        else if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            startService(context);
-            Log.d("wtf","Starting service - BOOT");
-        } else if (intent.getAction().equals("service.start")){
-            startService(context);
-            Log.d("wtf","Starting service");
-        }
-        */
+
         else{
             Log.d("wtf","Intent action not recognized");
         }
@@ -53,8 +45,8 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder;
         builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)
-                .setContentTitle("Please answer a few questions")
-                .setContentText("Ignore this message " + count)
+                .setContentTitle(context.getString(R.string.notification_title))
+                //.setContentText("Ignore this message " + count)
                 .setContentIntent(pendingIntent)
                 //.setStyle(new NotificationCompat.BigTextStyle()
                 //        .bigText("Much longer text that cannot fit one line..."))

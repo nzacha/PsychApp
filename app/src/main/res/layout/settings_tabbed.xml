@@ -26,7 +26,7 @@
             app:expandedTitleGravity="center_vertical"
             app:expandedTitleMarginStart="64dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Settings"
+            app:title="@string/settings"
             app:toolbarId="@+id/toolbar">
 
             <androidx.appcompat.widget.Toolbar

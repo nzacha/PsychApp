@@ -1,5 +1,6 @@
 package com.example.psychapp;
 
+
 import org.json.JSONArray;
 
 import java.io.Serializable;
@@ -48,6 +49,6 @@ public class Question implements Serializable {
     }
 
     public String toString(){
-        return id+") "+question+": "+type.name()+":"+level;
+        return id+") "+question+": "+type.name()+":"+level+" = "+answer;
     }
 }

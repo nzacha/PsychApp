@@ -3,9 +3,11 @@ package com.example.psychapp.ui.login;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +28,8 @@ import com.example.psychapp.R;
 import com.example.psychapp.data.model.LoggedInUser;
 import com.example.psychapp.ui.ConsentActivity;
 
+import java.util.Locale;
+
 public class LoginActivity extends AppCompatActivity {
     public static final Integer CODE_UNAVAILABLE= -1;
     public static final String LOGIN_INFO = "login_info";
@@ -37,8 +41,10 @@ public class LoginActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.instance = this;
-
         setContentView(R.layout.activity_login);
+
+        setLocale("el");
+
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
@@ -177,5 +183,17 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("login_name", user.getDisplayName());
         editor.putInt("login_researcherId", user.getResearcherId());
         editor.apply();
+    }
+
+    public void setLocale(String language) {
+        Log.d("wtf","language changed");
+        String languageToLoad  = language; // your language
+        Locale locale = new Locale(languageToLoad);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+        this.setContentView(R.layout.activity_login);
     }
 }

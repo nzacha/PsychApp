@@ -11,4 +11,22 @@
     <string name="login_failed">Αποτυχία σύνδεσης</string>
     <string name="invalid_username">Λάθος όνομα</string>
     <string name="invalid_password">Λάθος κωδικός</string>
+    <string name="tab_application">Εφαρμογή</string>
+    <string name="notification_title">Γεια σου, είναι αυτή η ώρα της ημέρας! Παρακαλώ πάρε ένα λεπτό για να απαντήσεις στις ερωτήσεις</string>
+    <string name="consent_title">Συναίνεση</string>
+    <string name="introduction_title">Περιγραφή</string>
+    <string name="code_hint">Κωδικός χρήστη</string>
+    <string name="action_sign_in">Σύνδεση</string>
+    <string name="questionnaire_title">Ερωτηματολόγιο</string>
+    <string name="questionnaire_button">Σύντομες ερωτήσεις 😊</string>
+    <string name="finish_quiz_button">Αποθήκευση</string>
+    <string name="exit_button">Έξοδος 🚪</string>
+    <string name="settings_button">Ρυθμίσεις ⚙️</string>
+    <string name="introduction_button">Περιγραφή έρευνας 📋</string>
+    <string name="notification_time">Τι ώρα θα ξυπνήσεις αύριο;</string>
+    <string name="notification_time_title">Παρακαλώ επιλέξτε τις ώρες της έρευνας</string>
+    <string name="save_button">Αποθήκευση</string>
+    <string name="settings">Ρυθμίσεις</string>
+    <string name="logout">Έξοδος</string>
+    <string name="logout_title">Τερματισμός Έρευνας</string>
 </resources>

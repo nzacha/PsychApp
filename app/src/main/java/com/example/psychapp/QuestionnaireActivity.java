@@ -8,7 +8,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -19,7 +18,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +33,6 @@ import com.android.volley.toolbox.Volley;
 import com.example.ExitActivity;
 import com.example.psychapp.Question.QuestionType;
 import com.example.psychapp.ui.login.LoginActivity;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -104,25 +101,31 @@ public class QuestionnaireActivity extends AppCompatActivity {
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + userId;
 
         Map<String, String> params = new HashMap<>();
-        String answer = null;
-        switch(question.type) {
-            case TEXT:
-                EditText questionText = findViewById(R.id.quiz_question_message);
-                answer = questionText.getText().toString();
-                break;
+        String answer = question.answer;
+        switch (question.type){
             case SLIDER:
             case SLIDER_DISCRETE:
-                SeekBar seekbar = findViewById(R.id.question_seekbar);
-                answer = ""+seekbar.getProgress();
+                int temp;
+                try {
+                    temp = Integer.parseInt(answer);
+                } catch (NumberFormatException nfe){
+                    temp = 0;
+                }
+                answer = ""+ (temp+1);
                 break;
             case MULTIPLE_CHOICE:
-                RadioGroup radioGroup = findViewById(R.id.choice_group);
-                int selectedId = radioGroup.getCheckedRadioButtonId();
-                RadioButton radioButton = findViewById(selectedId);
-                answer = ""+radioButton.getText();
+                int index;
+                try {
+                    index = Integer.parseInt(answer);
+                } catch (NumberFormatException nfe){
+                    index = 0;
+                }
+                answer = question.options[index];
                 break;
-            default:
-                throw new InputMismatchException();
+            case TEXT:
+                if(answer == "")
+                    answer = "No answer given";
+                break;
         }
         params.put("text", answer);
 
@@ -139,6 +142,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             });
 
         // add it to the RequestQueue
+        Log.d("wtf", "saved: "+question);
         queue.add(postRequest);
     }
 
@@ -246,7 +250,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
         Log.d("wtf", "Questions loaded from Phone");
     }
 
-
     public static void clearQuestions(){
         questions.clear();
 
@@ -281,6 +284,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     class QuizAdapter extends ArrayAdapter<Question>{
+        boolean val = true;
+
         public QuizAdapter(@NonNull Context context, ArrayList<Question> questions) {
             super(context, 0, questions);
         }
@@ -292,89 +297,108 @@ public class QuestionnaireActivity extends AppCompatActivity {
             switch(question.type) {
                 case TEXT:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question, parent, false);
-                    EditText message = convertView.findViewById(R.id.quiz_question_message);
-                    message.addTextChangedListener(new TextWatcher() {
+
+                    EditText answer = (EditText) convertView.findViewById(R.id.quiz_question_message);
+                    answer.addTextChangedListener(new TextWatcher() {
                         @Override
-                        public void afterTextChanged(Editable s) {
-                            question.answer = s.toString();
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         }
+
                         @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        }
+
                         @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                        public void afterTextChanged(Editable editable) {
+                            question.answer = editable.toString();
+                        }
                     });
-                    message.setText(question.answer);
+                    answer.setText(question.answer);
                     break;
                 case SLIDER:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider, parent, false);
-                    SeekBar continuousSeekBar = convertView.findViewById(R.id.question_seekbar);
-                    continuousSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+                    SeekBar bar = (SeekBar) convertView.findViewById(R.id.question_seekbar);
+                    bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                             question.answer = ""+i;
                         }
                         @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {}
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+                        }
                         @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+                        }
                     });
-                    continuousSeekBar.setMax(100);
+                    bar.setMax(100);
+
+                    int progress;
                     try {
-                        continuousSeekBar.setProgress(Integer.parseInt(question.answer));
-                    } catch (NumberFormatException nfe) {
-                        question.answer = "" + 0;
-                        continuousSeekBar.setProgress(Integer.parseInt(question.answer));
+                        progress = Integer.parseInt(question.answer);
+                    } catch (NumberFormatException nfe){
+                        progress = 0;
                     }
+                    bar.setProgress(progress);
+
                     break;
                 case SLIDER_DISCRETE:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
-                    SeekBar discreteSeekBar = convertView.findViewById(R.id.question_seekbar);
-                    discreteSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+                    SeekBar bar2 = (SeekBar) convertView.findViewById(R.id.question_seekbar);
+                    bar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                         @Override
                         public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                             question.answer = ""+i;
                         }
                         @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {}
+                        public void onStartTrackingTouch(SeekBar seekBar) {
+                        }
                         @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {}
+                        public void onStopTrackingTouch(SeekBar seekBar) {
+                        }
                     });
-                    discreteSeekBar.setMax(question.level-1);
+                    bar2.setMax(question.level-1);
+
+                    int progress2;
                     try {
-                        discreteSeekBar.setProgress(Integer.parseInt(question.answer));
-                    } catch (NumberFormatException nfe) {
-                        question.answer = "" + 0;
-                        discreteSeekBar.setProgress(Integer.parseInt(question.answer));
+                        progress2 = Integer.parseInt(question.answer);
+                    } catch (NumberFormatException nfe){
+                        progress2 = 0;
                     }
+                    bar2.setProgress(progress2);
                     break;
                 case MULTIPLE_CHOICE:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
-                    RadioGroup optionsGroup = convertView.findViewById(R.id.choice_group);
-                    optionsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+                    RadioGroup radioGroup = (RadioGroup) convertView.findViewById(R.id.choice_group);
+                    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                            RadioButton radio = radioGroup.findViewById(i);
-                            question.answer = "" + radioGroup.indexOfChild(radio);
+                            question.answer = ""+radioGroup.indexOfChild(radioGroup.findViewById(i));
                         }
                     });
-                    for(int i=0; i < question.options.length; i++){
-                        RadioButton newButton = new RadioButton( getContext());
-                        newButton.setText(question.options[i]);
-                        optionsGroup.addView(newButton);
+
+                    for(String option: question.options) {
+                        RadioButton button = new RadioButton(context);
+                        button.setText(option);
+                        radioGroup.addView(button);
                     }
+
                     try {
-                        optionsGroup.check(optionsGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+                        radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
                     } catch (NumberFormatException nfe) {
                         question.answer = "" + 0;
-                        optionsGroup.check(optionsGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+                        radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
                     }
                     break;
                 default:
                     throw new InputMismatchException();
             }
 
-            TextView title = convertView.findViewById(R.id.quiz_question_title);
+            TextView title = (TextView) convertView.findViewById(R.id.quiz_question_title);
             title.setText(question.question);
+
             return convertView;
         }
     }

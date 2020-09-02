@@ -25,7 +25,7 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleGravity="center_vertical"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="Consent"
+            app:title="@string/consent_title"
             app:toolbarId="@+id/toolbar">
 
             <androidx.appcompat.widget.Toolbar

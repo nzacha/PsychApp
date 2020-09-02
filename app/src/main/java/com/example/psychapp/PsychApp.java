@@ -7,12 +7,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Build;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.example.psychapp.ui.login.LoginActivity;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class PsychApp extends Application {
     //public static final String serverUrl = "http://192.168.0.17:5050/";

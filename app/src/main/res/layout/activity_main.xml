@@ -26,7 +26,7 @@
             app:expandedTitleGravity="center_vertical"
             app:expandedTitleMarginStart="24dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:title="PsychApp"
+            app:title="@string/app_name"
             app:toolbarId="@+id/toolbar">
 
             <androidx.appcompat.widget.Toolbar
