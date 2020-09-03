@@ -21,12 +21,10 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals("alarm")) {
             Toast.makeText(context.getApplicationContext(), "Please answer some short questions", Toast.LENGTH_LONG).show();
-            QuestionnaireActivity.enable();
+            QuestionnaireActivity.setEnabled(true);
             sendNotification(context, intent);
             Log.d("wtf","Sending Notification");
-        }
-
-        else{
+        } else {
             Log.d("wtf","Intent action not recognized");
         }
     }
@@ -37,11 +35,11 @@ public class NotificationReceiver extends BroadcastReceiver {
     }
 
     public void sendNotification(Context context, Intent intent){
-        intent = new Intent(context, QuestionnaireActivity.class);
+        Intent newIntent = new Intent(context, QuestionnaireActivity.class);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addNextIntentWithParentStack(intent);
-        PendingIntent pendingIntent = stackBuilder.getPendingIntent(count, PendingIntent.FLAG_UPDATE_CURRENT);
+        stackBuilder.addNextIntentWithParentStack(newIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(intent.getExtras().getInt("code"), PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder;
         builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)

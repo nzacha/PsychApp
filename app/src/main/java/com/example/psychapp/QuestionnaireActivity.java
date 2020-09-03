@@ -2,7 +2,6 @@ package com.example.psychapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -33,6 +33,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.ExitActivity;
 import com.example.psychapp.Question.QuestionType;
 import com.example.psychapp.ui.login.LoginActivity;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -40,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,7 +56,7 @@ import static com.example.psychapp.PsychApp.context;
 
 public class QuestionnaireActivity extends AppCompatActivity {
     private static ArrayList<Question> questions = new ArrayList<Question>();
-    private static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions";
+    private static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions", ANSWERS = "Answers";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +80,17 @@ public class QuestionnaireActivity extends AppCompatActivity {
         sendAnswersButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                for(Question question: questions) {
-                    sendAnswerToServer(question, PsychApp.userId);
+                if(PsychApp.isNetworkConnected(context)) {
+                    for (Question question : questions) {
+                        sendAnswerToServer(question, PsychApp.userId);
+                    }
+                    Log.d("wtf", "answers sent to server");
+                } else {
+                    try {
+                        saveAnswers();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 clearQuestions();
                 ExitActivity.exitApplication(PsychApp.context);
@@ -95,9 +106,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
         quizQuestionList.setAdapter(adapter);
     }
 
-    private void sendAnswerToServer(Question question, int userId){
+    private static void sendAnswerToServer(Question question, int userId){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(this);
+        final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + userId;
 
         Map<String, String> params = new HashMap<>();
@@ -114,13 +125,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 answer = ""+ (temp+1);
                 break;
             case MULTIPLE_CHOICE:
+            case MULTIPLE_CHOICE_HORIZONTAL:
                 int index;
                 try {
                     index = Integer.parseInt(answer);
+                    answer = question.options[index];
                 } catch (NumberFormatException nfe){
-                    index = 0;
+                    answer = question.answer;
                 }
-                answer = question.options[index];
                 break;
             case TEXT:
                 if(answer == "")
@@ -142,15 +154,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
             });
 
         // add it to the RequestQueue
-        Log.d("wtf", "saved: "+question);
+        //Log.d("wtf", "saved: "+question);
         queue.add(postRequest);
     }
 
     public static void retrieveQuestions(Context context, int researcherId){
-        if(isNetworkConnected(context)){
+        if(PsychApp.isNetworkConnected(context) && !questionsExist()){
             retrieveQuestionsFromServer(context, researcherId);
         } else {
-            Log.d("wtf","Internet connection not available");
             try {
                 loadQuestions();
             } catch (IOException e) {
@@ -159,6 +170,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static boolean questionsExist(){
+        File file = context.getFileStreamPath(QUESTIONS);
+        return file.exists();
     }
 
     private static void retrieveQuestionsFromServer(Context context, int researcherId){
@@ -174,8 +190,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                         questions.clear();
                         for( int i=0; i< response.length(); i++){
                             int id = -1;
-                            String  question = null;
-                            String type = null;
+                            String  question = null, type = null, orientation = null;
                             JSONArray options = null;
                             int level = 1;
                             try {
@@ -183,6 +198,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                 id = Integer.parseInt(questionObj.get("id").toString());
                                 question = questionObj.get("question_text").toString();
                                 type = questionObj.get("question_type").toString().toUpperCase();
+                                orientation = questionObj.get("orientation").toString();
                                 if(questionObj.has("question_options"))
                                     options = questionObj.getJSONArray("question_options");
                                 if(questionObj.has("levels"))
@@ -201,7 +217,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 }
-                                questions.add(new Question(id, question, optionsList));
+                                questions.add(new Question(id, question, optionsList, orientation));
                             }//sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
                                 if(level==0) {
@@ -228,8 +244,40 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 }
         );
 
+        Log.d("wtf","Retrieved questions from server");
         // add it to the RequestQueue
         queue.add(getRequest);
+    }
+
+    public static void sendLocalAnswers(int userId) throws IOException, ClassNotFoundException {
+        FileInputStream fis = context.openFileInput(ANSWERS);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        ArrayList<Question> answers = (ArrayList<Question>) is.readObject();
+        is.close();
+        fis.close();
+
+        if(answers.size() > 0) {
+            Log.d("wtf", "Answers loaded from Phone");
+
+            for (Question question : answers) {
+                sendAnswerToServer(question, userId);
+            }
+
+            context.deleteFile(ANSWERS);
+
+            Log.d("wtf", "Local answers sent to server");
+        }else{
+            Log.d("wtf", "No answers found locally");
+        }
+    }
+
+    private static void saveAnswers() throws IOException {
+        FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_APPEND);
+        ObjectOutputStream os = new ObjectOutputStream(fos);
+        os.writeObject(questions);
+        os.close();
+        fos.close();
+        Log.d("wtf", "Answers saved on Phone");
     }
 
     private static void saveQuestions() throws IOException {
@@ -257,18 +305,12 @@ public class QuestionnaireActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("status", false);
         editor.apply();
-
-        try {
-            saveQuestions();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
-    public static void enable(){
+    public static void setEnabled(boolean val){
         SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("status", true);
+        editor.putBoolean("status", val);
         editor.commit();
         editor.apply();
     }
@@ -276,11 +318,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
     public static boolean isActive(){
         SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("status", false);
-    }
-
-    public static boolean isNetworkConnected(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return (cm.getActiveNetworkInfo() != null) && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     class QuizAdapter extends ArrayAdapter<Question>{
@@ -369,19 +406,49 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     bar2.setProgress(progress2);
                     break;
                 case MULTIPLE_CHOICE:
+                case MULTIPLE_CHOICE_HORIZONTAL:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
 
                     RadioGroup radioGroup = (RadioGroup) convertView.findViewById(R.id.choice_group);
+                    if(question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL)
+                        radioGroup.setOrientation(LinearLayout.HORIZONTAL);
+
+                    final TextView reasoning = convertView.findViewById(R.id.reasoning_input);
+                    if(question.hint != null && !question.hint.equals(""))
+                        reasoning.setText(question.hint);
+                    reasoning.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        }
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        }
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+                            question.hint = editable.toString();
+                        }
+                    });
+
                     radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                            question.answer = ""+radioGroup.indexOfChild(radioGroup.findViewById(i));
+                            int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
+                            if (index == radioGroup.getChildCount()-1){
+                                reasoning.setVisibility(View.VISIBLE);
+                            } else {
+                                reasoning.setVisibility(View.GONE);
+                            }
+                            question.answer = ""+index;
                         }
                     });
 
                     for(String option: question.options) {
                         RadioButton button = new RadioButton(context);
                         button.setText(option);
+                        if(question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL) {
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+                            button.setLayoutParams(params);
+                        }
                         radioGroup.addView(button);
                     }
 

@@ -1,25 +1,39 @@
 package com.example.psychapp.ui.login;
 
+import android.util.Log;
+import android.util.Patterns;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.psychapp.PsychApp;
 import com.example.psychapp.R;
-import com.example.psychapp.data.LoginRepository;
 import com.example.psychapp.data.Result;
 import com.example.psychapp.data.model.LoggedInUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class LoginViewModel extends ViewModel {
     public static LoginViewModel instance;
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private LoginRepository loginRepository;
+
+    private Result res;
     private String code;
 
-    LoginViewModel(LoginRepository loginRepository) {
-        this.loginRepository = loginRepository;
-        instance = this;
+    LoginViewModel(String code) {
+        this.code = code;
     }
 
     LiveData<LoginFormState> getLoginFormState() {
@@ -31,13 +45,38 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login() {
-        // can be launched in a separate asynchronous job
-        loginRepository.login(code);
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
+        String url = PsychApp.serverUrl + "users/" + code;
+
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject researcher = response.getJSONObject("researcher");
+                            res = new Result.Success(new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), Integer.parseInt(response.get("researcherId").toString()), Integer.parseInt(researcher.get("study_length").toString()), Integer.parseInt(researcher.get("tests_per_day").toString()), Integer.parseInt(researcher.get("tests_time_interval").toString())));
+                        } catch (JSONException e) {
+                            res = new Result.Error(new IOException("Error with JSONObject", e));
+                        }
+                        authenticateResult();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        res = new Result.Error(new IOException("Error logging in", error));
+                        authenticateResult();
+                    }
+                });
+
+        // add it to the RequestQueue
+        queue.add(postRequest);
     }
 
-    public void authenticateResult(Result result){
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+    public void authenticateResult(){
+        if (res instanceof Result.Success) {
+            LoggedInUser data = ((Result.Success<LoggedInUser>) res).getData();
             loginResult.postValue(new LoginResult(data));
         } else {
             loginResult.postValue(new LoginResult(R.string.login_failed));
@@ -62,10 +101,10 @@ public class LoginViewModel extends ViewModel {
             return false;
         }
         /*
-        if (username.contains("@")) {
-            return Patterns.EMAIL_ADDRESS.matcher(username).matches();
+        if (code.contains("@")) {
+            return Patterns.EMAIL_ADDRESS.matcher(code).matches();
         } else {
-            return !username.trim().isEmpty();
+            return !code.trim().isEmpty();
         }
         */
         return true;

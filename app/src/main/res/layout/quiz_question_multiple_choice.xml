@@ -19,6 +19,15 @@
         android:id="@+id/choice_group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical" />
+        android:orientation="vertical"/>
+
+    <EditText
+        android:id="@+id/reasoning_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:hint="@string/reasoning_hint"
+        android:textSize="22sp"
+        android:visibility="visible" />
 
 </LinearLayout>

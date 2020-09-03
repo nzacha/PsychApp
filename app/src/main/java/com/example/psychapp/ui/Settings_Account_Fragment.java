@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 
@@ -25,13 +26,9 @@ public class Settings_Account_Fragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(LoginActivity.LOGIN_INFO, getContext().MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("login_code");
-                editor.remove("login_name");
-                editor.remove("login_researcherId");
-                editor.apply();
-                getActivity().finishAffinity();
+            LoginActivity.clearInfo();
+            getActivity().finishAffinity();
+            QuestionnaireActivity.setEnabled(false);
             }
         });
 

@@ -33,7 +33,7 @@ import java.util.Calendar;
 import java.util.InputMismatchException;
 
 public class Settings_Notification_Fragment extends Fragment {
-    private static final String Settings_State = "settings_Stae";
+    private static final String Settings_State = "settings_State";
     public static int DEFAULT_HOUR = 8, DEFAULT_MINUTES = 0, MINIMUM_HOUR = 4, MAXIMUM_HOUR = 22;
     public ArrayList<Integer> hours = new ArrayList<Integer>();
     public ArrayList<Integer> minutes = new ArrayList<Integer>();
@@ -51,7 +51,7 @@ public class Settings_Notification_Fragment extends Fragment {
         final View root = inflater.inflate(R.layout.settings_notification_fragment, container, false);
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
         for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
-            Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + (4 * i));
+            Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + (PsychApp.ALARM_INTERVAL * i));
             Integer minute = sharedPreferences.getInt("minute_value_" + i, DEFAULT_MINUTES);
             hours.add(hour);
             minutes.add(minute);
@@ -101,13 +101,15 @@ public class Settings_Notification_Fragment extends Fragment {
         } else if (PsychApp.NUMBER_OF_ALARMS > 1) {
             notificationTime.setVisibility(View.INVISIBLE);
             notificationLabel.setVisibility(View.INVISIBLE);
-            notificationTimes.check(notificationTimes.getChildAt(0).getId());
 
             RadioButton radio;
             for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
-                radio = (RadioButton) notificationTimes.getChildAt(i);
+                radio = new RadioButton(getContext());
                 radio.setText(String.format("%02d:%02d", hours.get(i), minutes.get(i)));
+                notificationTimes.addView(radio);
             }
+            notificationTimes.check(notificationTimes.getChildAt(0).getId());
+
             radio = (RadioButton) root.findViewById(notificationTimes.getCheckedRadioButtonId());
             Integer hour = Integer.parseInt(radio.getText().toString().split(":")[0]);
             Integer minute = Integer.parseInt(radio.getText().toString().split(":")[1]);
@@ -129,16 +131,16 @@ public class Settings_Notification_Fragment extends Fragment {
                     if (index == 0) {
                         tempRadio = (RadioButton) radioGroup.getChildAt(index + 1);
                         hourMin = MINIMUM_HOUR;
-                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - 3;
+                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - PsychApp.ALARM_INTERVAL;
                     } else if (index == PsychApp.NUMBER_OF_ALARMS -1) {
                         tempRadio = (RadioButton) radioGroup.getChildAt(index -1);
-                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + 3;
+                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + PsychApp.ALARM_INTERVAL;
                         hourMax = MAXIMUM_HOUR;
                     } else {
                         tempRadio = (RadioButton) radioGroup.getChildAt(index -1);
-                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + 3;
+                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + PsychApp.ALARM_INTERVAL;
                         tempRadio = (RadioButton) radioGroup.getChildAt(index +1);
-                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - 3;
+                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - PsychApp.ALARM_INTERVAL;
                     }
 
                     hourSpinner.setMinValue(hourMin);
@@ -181,8 +183,6 @@ public class Settings_Notification_Fragment extends Fragment {
                         calendar.set(Calendar.MINUTE, minutes.get(i));
 
                         PsychApp.instance.scheduleDailyNotification(calendar, 2612 + i);
-
-                        Log.d("Notification","reminder set for " + calendar);
                     }
                     getActivity().finish();
                 }

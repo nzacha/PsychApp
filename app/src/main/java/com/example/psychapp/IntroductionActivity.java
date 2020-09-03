@@ -88,7 +88,7 @@ public class IntroductionActivity extends AppCompatActivity {
     }
 
     public void loadDescription(TextView description) throws IOException, ClassNotFoundException {
-        if(isNetworkConnected(this)) {
+        if(PsychApp.isNetworkConnected(this)) {
             setDescriptionFromDB(description);
         } else {
             loadDescriptionFromFile(description);
@@ -123,9 +123,13 @@ public class IntroductionActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            text[0] = response.getString("description");
+                            text[0] = (String) response.get("description");
                             description.setText(text[0]);
+                            saveDescriptionLocally(text[0]);
+                            Log.d("wtf", text[0]);
                         } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
@@ -133,18 +137,12 @@ public class IntroductionActivity extends AppCompatActivity {
                 new Response.ErrorListener(){
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.d("wtf", "error");
                     }
                 }
         );
 
         // add it to the RequestQueue
         queue.add(getRequest);
-
-        saveDescriptionLocally(text[0]);
-    }
-
-    public static boolean isNetworkConnected(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return (cm.getActiveNetworkInfo() != null) && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 }

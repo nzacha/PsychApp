@@ -8,6 +8,7 @@ import java.io.Serializable;
 import static com.example.psychapp.Question.QuestionType.*;
 
 public class Question implements Serializable {
+    public static final String VERTICAL = "Vertical", HORIZONTAL = "Horizontal";
     public static final int View_ID = 100;
     public Question(String question, QuestionType type, JSONArray options) {
     }
@@ -16,12 +17,13 @@ public class Question implements Serializable {
         TEXT,
         SLIDER,
         SLIDER_DISCRETE,
-        MULTIPLE_CHOICE
+        MULTIPLE_CHOICE,
+        MULTIPLE_CHOICE_HORIZONTAL,
     }
 
     public int id;
     public String question = "Placeholder Question";
-    public String answer = "";
+    public String answer = "", hint = null;
     public QuestionType type = TEXT;
     public String[] options;
     public int level;
@@ -33,10 +35,15 @@ public class Question implements Serializable {
     }
 
     //constructor for multiple choice questions
-    public Question(int id, String question, String[] options){
+    public Question(int id, String question, String[] options, String orientation){
         this.id = id;
         this.question = question;
-        this.type = MULTIPLE_CHOICE;
+        if(orientation.equals(VERTICAL)) {
+            this.type = MULTIPLE_CHOICE;
+        } else if (orientation.equals(HORIZONTAL)){
+            this.type = MULTIPLE_CHOICE_HORIZONTAL;
+        }
+        this.answer = "" + 0;
         this.options = options;
     }
 
