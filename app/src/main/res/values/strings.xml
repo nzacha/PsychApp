@@ -31,6 +31,9 @@
     <string name="save_button">Αποθήκευση</string>
     <string name="settings">Ρυθμίσεις</string>
     <string name="logout">Έξοδος</string>
-    <string name="logout_title">Τερματισμός Έρευνας</string>
+    <string name="logout_title">Αποσύνδεση</string>
     <string name="reasoning_hint">Παρακαλώ δώστε λόγο</string>
+    <string name="stop_research">Τερματισμός έρευνας</string>
+    <string name="stop_button">ΤΕΡΜΑΤΙΣΜΌΣ</string>
+    <string name="request_other">\'Αλλο</string>
 </resources>

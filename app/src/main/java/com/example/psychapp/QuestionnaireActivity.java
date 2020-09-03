@@ -2,6 +2,7 @@ package com.example.psychapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,6 +21,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -159,7 +161,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static void retrieveQuestions(Context context, int researcherId){
-        if(PsychApp.isNetworkConnected(context) && !questionsExist()){
+        if(PsychApp.isNetworkConnected(context)){ // && !questionsExist()
             retrieveQuestionsFromServer(context, researcherId);
         } else {
             try {
@@ -185,6 +187,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         // prepare the Request
         JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONArray>(){
+                    @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onResponse(JSONArray response) {
                         questions.clear();
@@ -192,13 +195,15 @@ public class QuestionnaireActivity extends AppCompatActivity {
                             int id = -1;
                             String  question = null, type = null, orientation = null;
                             JSONArray options = null;
+                            boolean requestReason = true;
                             int level = 1;
                             try {
                                 JSONObject questionObj = response.getJSONObject(i);
-                                id = Integer.parseInt(questionObj.get("id").toString());
-                                question = questionObj.get("question_text").toString();
-                                type = questionObj.get("question_type").toString().toUpperCase();
-                                orientation = questionObj.get("orientation").toString();
+                                id = questionObj.getInt("id");
+                                question = questionObj.getString("question_text");
+                                type = questionObj.getString("question_type").toUpperCase();
+                                orientation = questionObj.getString("orientation");
+                                requestReason = questionObj.getBoolean("request_reason");
                                 if(questionObj.has("question_options"))
                                     options = questionObj.getJSONArray("question_options");
                                 if(questionObj.has("levels"))
@@ -217,19 +222,24 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 }
-                                questions.add(new Question(id, question, optionsList, orientation));
-                            }//sliders
+                                questions.add(new Question(id, question, optionsList, orientation, requestReason));
+                            }
+                            //sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
                                 if(level==0) {
                                     questions.add(new Question(id, question, QuestionType.SLIDER, 0));
                                 }else{
                                     questions.add(new Question(id, question, QuestionType.SLIDER_DISCRETE, level));
                                 }
-                            }//text
+                            }
+                            //text
                             else{
                                 questions.add(new Question(id, question, QuestionType.TEXT));
                             }
                         }
+
+                        questions.sort(new QuestionsComparator());
+
                         try {
                             saveQuestions();
                         } catch (IOException e) {
@@ -414,26 +424,30 @@ public class QuestionnaireActivity extends AppCompatActivity {
                         radioGroup.setOrientation(LinearLayout.HORIZONTAL);
 
                     final TextView reasoning = convertView.findViewById(R.id.reasoning_input);
-                    if(question.hint != null && !question.hint.equals(""))
-                        reasoning.setText(question.hint);
-                    reasoning.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        }
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        }
-                        @Override
-                        public void afterTextChanged(Editable editable) {
-                            question.hint = editable.toString();
-                        }
-                    });
+                    if(question.requestReason) {
+                        if (question.hint != null && !question.hint.equals(""))
+                            reasoning.setText(question.hint);
+                        reasoning.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                question.hint = editable.toString();
+                            }
+                        });
+                    }
 
                     radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(RadioGroup radioGroup, int i) {
                             int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
-                            if (index == radioGroup.getChildCount()-1){
+                            if (question.requestReason && index == radioGroup.getChildCount()-1){
                                 reasoning.setVisibility(View.VISIBLE);
                             } else {
                                 reasoning.setVisibility(View.GONE);
@@ -446,6 +460,16 @@ public class QuestionnaireActivity extends AppCompatActivity {
                         RadioButton button = new RadioButton(context);
                         button.setText(option);
                         if(question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL) {
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+                            button.setLayoutParams(params);
+                        }
+                        radioGroup.addView(button);
+                    }
+
+                    if(question.requestReason) {
+                        RadioButton button = new RadioButton(context);
+                        button.setText(getString(R.string.request_other));
+                        if (question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL) {
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
                             button.setLayoutParams(params);
                         }

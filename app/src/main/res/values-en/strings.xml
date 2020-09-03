@@ -21,7 +21,7 @@
     <string name="introduction_title">Introduction</string>
     <string name="code_hint">Please provide a Code</string>
     <string name="action_sign_in">Sign in</string>
-    <string name="questionnaire_title">Short Questionnaire</string>
+    <string name="questionnaire_title">Short Questions</string>
     <string name="questionnaire_button">Questionnaire 😊</string>
     <string name="finish_quiz_button">Finish quiz</string>
     <string name="introduction_button">Description  📋</string>
@@ -34,4 +34,7 @@
     <string name="logout">Log Out</string>
     <string name="logout_title">Log out from device</string>
     <string name="reasoning_hint">Please provide a reason</string>
+    <string name="stop_button">STOP</string>
+    <string name="stop_research">Stop study</string>
+    <string name="request_other">Other</string>
 </resources>
