@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        final boolean savedData = (user==null);
         loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
             @Override
             public void onChanged(@Nullable LoginResult loginResult) {
@@ -87,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    updateUiWithUser(user, user == null);
+                    updateUiWithUser(user, (savedData && user!=null));
                     setResult(Activity.RESULT_OK);
                     finish();
                 }
@@ -95,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         //user exists
-        if(user != null){
+        if(!savedData){
             Log.d("wtf","code available");
             codeEditText.setVisibility(View.GONE);
             loginButton.setVisibility(View.GONE);

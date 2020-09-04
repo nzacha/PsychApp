@@ -283,6 +283,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static void sendLocalAnswers(int userId) throws IOException, ClassNotFoundException {
+        if(!new File(ANSWERS).exists())
+            return;
         FileInputStream fis = context.openFileInput(ANSWERS);
         ObjectInputStream is = new ObjectInputStream(fis);
         ArrayList<Question> answers = (ArrayList<Question>) is.readObject();
