@@ -1,9 +1,7 @@
 package com.example.psychapp.ui;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,20 +12,18 @@ import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.psychapp.PsychApp;
 import com.example.psychapp.R;
+import com.example.psychapp.ui.login.LoginActivity;
 
-import java.lang.reflect.Field;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.InputMismatchException;
@@ -50,8 +46,8 @@ public class Settings_Notification_Fragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.settings_notification_fragment, container, false);
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
-        for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
-            Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + (PsychApp.ALARM_INTERVAL * i));
+        for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){
+            Integer hour = sharedPreferences.getInt("hour_value_" + i, DEFAULT_HOUR + (LoginActivity.user.getTestsTimeInterval() * i));
             Integer minute = sharedPreferences.getInt("minute_value_" + i, DEFAULT_MINUTES);
             hours.add(hour);
             minutes.add(minute);
@@ -66,44 +62,28 @@ public class Settings_Notification_Fragment extends Fragment {
         minuteSpinner.setDisplayedValues(new String[]{"00","15","30","45"});
         minuteSpinner.setValue(1);
 
-
         notificationLabel = root.findViewById(R.id.notification_label);
         notificationTime = root.findViewById(R.id.notification_time);
         notificationTimes = root.findViewById(R.id.notifications);
 
-        if (PsychApp.NUMBER_OF_ALARMS == 1) {
-            notificationTimes.setVisibility(View.INVISIBLE);
-            notificationTime.setText(String.format("%02d:%02d", hours.get(0), minutes.get(0)));
-
-            Button notificationTimeButton = root.findViewById(R.id.notificationTimeButton);
-            notificationTimeButton.setOnClickListener(new View.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View view) {
-                    hours.clear();
-                    minutes.clear();
-                    hours.add(datePicker.getHour());
-                    minutes.add(datePicker.getMinute());
-
-                    notificationTime.setText(String.format("%02d:%02d", hours.get(0), minutes.get(0)));
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(System.currentTimeMillis());
-                    calendar.set(Calendar.HOUR_OF_DAY, hours.get(0));
-                    calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
-
-                    PsychApp.instance.scheduleDailyNotification(calendar, 2612);
-
-                    Log.d("Notification","reminder set for "+calendar);
-                    getActivity().finish();
+        datePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker timePicker, int i, int i1) {
+                if(LoginActivity.user.getTestsPerDay() > 1  && LoginActivity.user.getAllowIndividualTimes()) {
+                    RadioButton radio = (RadioButton) root.findViewById(notificationTimes.getCheckedRadioButtonId());
+                    radio.setText(String.format("%02d:%02d", datePicker.getHour(), datePicker.getMinute() * MINUTE_INTERVAL));
+                }else{
+                    notificationTime.setText(String.format("%02d:%02d", datePicker.getHour(), datePicker.getMinute() * MINUTE_INTERVAL));
                 }
-            });
-        } else if (PsychApp.NUMBER_OF_ALARMS > 1) {
+            }
+        });
+
+        if (LoginActivity.user.getTestsPerDay() > 1  && LoginActivity.user.getAllowIndividualTimes()) {
             notificationTime.setVisibility(View.INVISIBLE);
             notificationLabel.setVisibility(View.INVISIBLE);
 
             RadioButton radio;
-            for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
+            for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){
                 radio = new RadioButton(getContext());
                 radio.setText(String.format("%02d:%02d", hours.get(i), minutes.get(i)));
                 notificationTimes.addView(radio);
@@ -122,8 +102,8 @@ public class Settings_Notification_Fragment extends Fragment {
                 public void onCheckedChanged(RadioGroup radioGroup, int i) {
                     RadioButton radio = (RadioButton) root.findViewById(radioGroup.getCheckedRadioButtonId());
                     int index = radioGroup.indexOfChild(radio);
-                    Integer hourMin, hourMax, hour = Integer.parseInt(radio.getText().toString().split(":")[0]);
-                    Integer minutes = Integer.parseInt(radio.getText().toString().split(":")[1]);
+                    int hourMin, hourMax, hour = Integer.parseInt(radio.getText().toString().split(":")[0]);
+                    int minutes = Integer.parseInt(radio.getText().toString().split(":")[1]);
                     hourMin = hour;
                     hourMax = hour;
 
@@ -131,16 +111,16 @@ public class Settings_Notification_Fragment extends Fragment {
                     if (index == 0) {
                         tempRadio = (RadioButton) radioGroup.getChildAt(index + 1);
                         hourMin = MINIMUM_HOUR;
-                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - PsychApp.ALARM_INTERVAL;
-                    } else if (index == PsychApp.NUMBER_OF_ALARMS -1) {
+                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - LoginActivity.user.getTestsTimeInterval();
+                    } else if (index == LoginActivity.user.getTestsPerDay() -1) {
                         tempRadio = (RadioButton) radioGroup.getChildAt(index -1);
-                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + PsychApp.ALARM_INTERVAL;
+                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + LoginActivity.user.getTestsTimeInterval();
                         hourMax = MAXIMUM_HOUR;
                     } else {
                         tempRadio = (RadioButton) radioGroup.getChildAt(index -1);
-                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + PsychApp.ALARM_INTERVAL;
+                        hourMin = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) + LoginActivity.user.getTestsTimeInterval();
                         tempRadio = (RadioButton) radioGroup.getChildAt(index +1);
-                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - PsychApp.ALARM_INTERVAL;
+                        hourMax = Integer.parseInt(tempRadio.getText().toString().split(":")[0]) - LoginActivity.user.getTestsTimeInterval();
                     }
 
                     hourSpinner.setMinValue(hourMin);
@@ -151,20 +131,6 @@ public class Settings_Notification_Fragment extends Fragment {
                 }
             });
 
-            datePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-                @Override
-                public void onTimeChanged(TimePicker timePicker, int i, int i1) {
-                    RadioButton radio = (RadioButton) root.findViewById(notificationTimes.getCheckedRadioButtonId());
-                    radio.setText(String.format("%02d:%02d", datePicker.getHour(), datePicker.getMinute() * MINUTE_INTERVAL));
-
-                    for (int j=0; j<PsychApp.NUMBER_OF_ALARMS -1; j++) {
-                        RadioButton button1 = (RadioButton) notificationTimes.getChildAt(j);
-                        RadioButton button2 = (RadioButton) notificationTimes.getChildAt(j+1);
-
-                    }
-                }
-            });
-
             Button notificationTimeButton = root.findViewById(R.id.notificationTimeButton);
             notificationTimeButton.setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -172,7 +138,7 @@ public class Settings_Notification_Fragment extends Fragment {
                 public void onClick(View view) {
                     hours.clear();
                     minutes.clear();
-                    for (int i = 0; i < PsychApp.NUMBER_OF_ALARMS; i++){
+                    for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){
                         RadioButton radio = (RadioButton) notificationTimes.getChildAt(i);
                         hours.add(Integer.parseInt(radio.getText().toString().split(":")[0]));
                         minutes.add(Integer.parseInt(radio.getText().toString().split(":")[1]));
@@ -188,7 +154,37 @@ public class Settings_Notification_Fragment extends Fragment {
                 }
             });
         } else {
-            throw new InputMismatchException();
+            // else (LoginActivity.user.getTestsPerDay() == 1) {
+            notificationTimes.setVisibility(View.INVISIBLE);
+            notificationTime.setText(String.format("%02d:%02d", hours.get(0), minutes.get(0) * MINUTE_INTERVAL));
+
+            Integer hour = Integer.parseInt(notificationTime.getText().toString().split(":")[0]);
+            Integer minute = Integer.parseInt(notificationTime.getText().toString().split(":")[1]);
+            datePicker.setHour(hour);
+            datePicker.setMinute(minute / MINUTE_INTERVAL);
+            datePicker.setIs24HourView(true);
+
+            Button notificationTimeButton = root.findViewById(R.id.notificationTimeButton);
+            notificationTimeButton.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.M)
+                @Override
+                public void onClick(View view) {
+                    hours.clear();
+                    minutes.clear();
+                    hours.add(datePicker.getHour());
+                    minutes.add(datePicker.getMinute());
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                    calendar.set(Calendar.HOUR_OF_DAY, hours.get(0));
+                    calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
+
+                    PsychApp.instance.scheduleDailyNotification(calendar, 2612);
+
+                    Log.d("Notification","reminder set for "+calendar);
+                    getActivity().finish();
+                }
+            });
         }
         return root;
     }
@@ -196,10 +192,23 @@ public class Settings_Notification_Fragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
+        /*
+        try {
+            LoginActivity.loadUserInfo();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        if(LoginActivity.user == null)
+            return;
+        */
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        for(int i=0; i < PsychApp.NUMBER_OF_ALARMS; i++) {
+        int maxValue = LoginActivity.user.getTestsPerDay();
+        if(!LoginActivity.user.getAllowIndividualTimes())
+            maxValue =1;
+        for(int i=0; i < maxValue; i++) {
             editor.putInt("hour_value_" + i, hours.get(i));
             editor.putInt("minute_value_" + i, minutes.get(i));
         }

@@ -37,4 +37,10 @@
     <string name="stop_button">STOP</string>
     <string name="stop_research">Stop study</string>
     <string name="request_other">Other</string>
+    <string name="user_inactive">User was deactivated</string>
+    <string name="unkown_error">Unkown error</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="researcher">Researcher</string>
+    <string name="description">Description</string>
 </resources>

@@ -28,6 +28,6 @@
         android:layout_margin="4dp"
         android:hint="@string/reasoning_hint"
         android:textSize="22sp"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 </LinearLayout>

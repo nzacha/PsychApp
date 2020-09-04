@@ -15,8 +15,7 @@ public class ExitActivity extends Activity {
         }
     }
 
-    public static void exitApplication(Context context)
-    {
+    public static void exitApplication(Context context){
         Intent intent = new Intent(context, ExitActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         context.startActivity(intent);

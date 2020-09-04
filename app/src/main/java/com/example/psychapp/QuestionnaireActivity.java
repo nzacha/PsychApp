@@ -34,6 +34,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.ExitActivity;
 import com.example.psychapp.Question.QuestionType;
+import com.example.psychapp.data.model.LoggedInUser;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -63,6 +64,22 @@ public class QuestionnaireActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(LoginActivity.user ==null){
+            try {
+                LoginActivity.loadUserInfo();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            if(!LoginActivity.user.isActive()) {
+                setEnabled(false);
+                clearQuestions();
+                LoginActivity.clearInfo();
+                finishAffinity();
+            }
+        }
         setContentView(R.layout.activity_questionnaire);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -84,7 +101,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(PsychApp.isNetworkConnected(context)) {
                     for (Question question : questions) {
-                        sendAnswerToServer(question, PsychApp.userId);
+                        sendAnswerToServer(question, LoginActivity.user.getUserId());
                     }
                     Log.d("wtf", "answers sent to server");
                 } else {
@@ -99,10 +116,15 @@ public class QuestionnaireActivity extends AppCompatActivity {
             }
         });
 
-        if(PsychApp.userId == LoginActivity.CODE_UNAVAILABLE)
-            LoginActivity.loadUserData();
-        Log.d("wtf",questions.toString());
-        retrieveQuestions(this, PsychApp.researcherId);
+        //Log.d("wtf",questions.toString());
+        try {
+            LoginActivity.loadUserInfo();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        retrieveQuestions(this, LoginActivity.user.getResearcherId());
         QuizAdapter adapter = new QuizAdapter(this, questions);
         ListView quizQuestionList = findViewById(R.id.quiz_question_list);
         quizQuestionList.setAdapter(adapter);
@@ -128,12 +150,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 break;
             case MULTIPLE_CHOICE:
             case MULTIPLE_CHOICE_HORIZONTAL:
-                int index;
+                int index ;
                 try {
                     index = Integer.parseInt(answer);
                     answer = question.options[index];
                 } catch (NumberFormatException nfe){
-                    answer = question.answer;
+                    answer = nfe.getMessage();
+                } catch (ArrayIndexOutOfBoundsException nfe){
+                    answer = question.hint;
                 }
                 break;
             case TEXT:
@@ -142,7 +166,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 break;
         }
         params.put("text", answer);
-
+        params.put("progress", ""+LoginActivity.user.getProgress());
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
             new Response.Listener<JSONObject>() {
                 @Override
@@ -331,14 +355,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     class QuizAdapter extends ArrayAdapter<Question>{
-        boolean val = true;
-
         public QuizAdapter(@NonNull Context context, ArrayList<Question> questions) {
             super(context, 0, questions);
         }
 
         @Override
         public View getView(int position, View convertView, @NonNull ViewGroup parent){
+            //This is a bad implementation but at least i only have to make one adapter :)
+
             final Question question = getItem(position);
 
             switch(question.type) {
@@ -423,39 +447,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     if(question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL)
                         radioGroup.setOrientation(LinearLayout.HORIZONTAL);
 
-                    final TextView reasoning = convertView.findViewById(R.id.reasoning_input);
-                    if(question.requestReason) {
-                        if (question.hint != null && !question.hint.equals(""))
-                            reasoning.setText(question.hint);
-                        reasoning.addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            }
-
-                            @Override
-                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            }
-
-                            @Override
-                            public void afterTextChanged(Editable editable) {
-                                question.hint = editable.toString();
-                            }
-                        });
-                    }
-
-                    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                            int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
-                            if (question.requestReason && index == radioGroup.getChildCount()-1){
-                                reasoning.setVisibility(View.VISIBLE);
-                            } else {
-                                reasoning.setVisibility(View.GONE);
-                            }
-                            question.answer = ""+index;
-                        }
-                    });
-
                     for(String option: question.options) {
                         RadioButton button = new RadioButton(context);
                         button.setText(option);
@@ -476,12 +467,52 @@ public class QuestionnaireActivity extends AppCompatActivity {
                         radioGroup.addView(button);
                     }
 
+                    final TextView reasoning = convertView.findViewById(R.id.reasoning_input);
+                    Log.d("questions", "question adapter before: "+question.answer);
                     try {
                         radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+                        if (question.requestReason && Integer.parseInt(question.answer) == radioGroup.getChildCount()-1){
+                            reasoning.setVisibility(View.VISIBLE);
+                        } else {
+                            reasoning.setVisibility(View.GONE);
+                        }
                     } catch (NumberFormatException nfe) {
                         question.answer = "" + 0;
                         radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
                     }
+                    Log.d("questions", "question adapter after: "+question.answer);
+
+                    if(question.requestReason) {
+                        if (question.hint != null && !question.hint.equals(""))
+                            reasoning.setText(question.hint);
+                        reasoning.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            }
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            }
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                question.hint = editable.toString();
+                            }
+                        });
+                    }
+
+                    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                            int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
+                            question.answer = ""+index;
+                            if (question.requestReason && index == radioGroup.getChildCount()-1){
+                                reasoning.setVisibility(View.VISIBLE);
+                            } else {
+                                reasoning.setVisibility(View.GONE);
+                            }
+                            notifyDataSetChanged();
+                            Log.d("questions", "check listener: "+index);
+                        }
+                    });
                     break;
                 default:
                     throw new InputMismatchException();

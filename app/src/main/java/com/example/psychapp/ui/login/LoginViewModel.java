@@ -1,7 +1,6 @@
 package com.example.psychapp.ui.login;
 
 import android.util.Log;
-import android.util.Patterns;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -15,6 +14,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.PsychApp;
 import com.example.psychapp.R;
+import com.example.psychapp.data.Exceptions;
 import com.example.psychapp.data.Result;
 import com.example.psychapp.data.model.LoggedInUser;
 
@@ -54,8 +54,7 @@ public class LoginViewModel extends ViewModel {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONObject researcher = response.getJSONObject("researcher");
-                            res = new Result.Success(new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), Integer.parseInt(response.get("researcherId").toString()), Integer.parseInt(researcher.get("study_length").toString()), Integer.parseInt(researcher.get("tests_per_day").toString()), Integer.parseInt(researcher.get("tests_time_interval").toString())));
+                            res = new Result.Success(new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), Integer.parseInt(response.get("researcherId").toString()), Integer.parseInt(response.get("study_length").toString()), Integer.parseInt(response.get("tests_per_day").toString()), Integer.parseInt(response.get("tests_time_interval").toString()), response.getBoolean("allow_individual_times"), response.getBoolean("allow_user_termination"), response.getBoolean("automatic_termination"), response.getInt("progress"), response.getInt("questions_total")));
                         } catch (JSONException e) {
                             res = new Result.Error(new IOException("Error with JSONObject", e));
                         }
@@ -65,7 +64,16 @@ public class LoginViewModel extends ViewModel {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        res = new Result.Error(new IOException("Error logging in", error));
+                        switch(error.networkResponse.statusCode){
+                            case 400:
+                                res = new Result.Error(new Exceptions.UserInactive());
+                                break;
+                            case 404:
+                                res = new Result.Error(new Exceptions.InvalidCredentials());
+                                break;
+                            default:
+                                res = new Result.Error(new Exception());
+                        }
                         authenticateResult();
                     }
                 });
@@ -79,7 +87,14 @@ public class LoginViewModel extends ViewModel {
             LoggedInUser data = ((Result.Success<LoggedInUser>) res).getData();
             loginResult.postValue(new LoginResult(data));
         } else {
-            loginResult.postValue(new LoginResult(R.string.login_failed));
+            Result.Error error = (Result.Error) res;
+            if (error.getError() instanceof Exceptions.UserInactive){
+                loginResult.postValue(new LoginResult(R.string.user_inactive));
+            }else if (error.getError() instanceof Exceptions.InvalidCredentials){
+                loginResult.postValue(new LoginResult(R.string.login_failed));
+            }else {
+                loginResult.postValue(new LoginResult(R.string.unkown_error));
+            }
         }
     }
 

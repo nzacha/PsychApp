@@ -36,4 +36,10 @@
     <string name="stop_research">Τερματισμός έρευνας</string>
     <string name="stop_button">ΤΕΡΜΑΤΙΣΜΌΣ</string>
     <string name="request_other">\'Αλλο</string>
+    <string name="user_inactive">Ο χρήστης απενεργοποιήθηκε</string>
+    <string name="unkown_error">Κάτι πήγε στραβά</string>
+    <string name="description">Περιγραφή</string>
+    <string name="researcher">Ερευνητής</string>
+    <string name="phone">Τηλέφωνο</string>
+    <string name="email">Email</string>
 </resources>

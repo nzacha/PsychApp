@@ -36,7 +36,7 @@ public class Question implements Serializable {
     }
 
     //constructor for multiple choice questions
-    public Question(int id, String question, String[] options, String orientation, boolean requesReason){
+    public Question(int id, String question, String[] options, String orientation, boolean requestReason){
         this.id = id;
         this.question = question;
         if(orientation.equals(VERTICAL)) {
@@ -46,7 +46,7 @@ public class Question implements Serializable {
         }
         this.answer = "" + 0;
         this.options = options;
-        this.requestReason = requesReason;
+        this.requestReason = requestReason;
     }
 
     //constructor for slider

@@ -1,6 +1,5 @@
 package com.example.psychapp.ui;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.LongDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
@@ -29,9 +27,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.psychapp.PsychApp;
 import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.R;
-import com.example.psychapp.SettingsActivity;
 import com.example.psychapp.ui.login.LoginActivity;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONObject;
 
@@ -39,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.psychapp.PsychApp.context;
-import static com.example.psychapp.PsychApp.userId;
 
 public class Settings_Account_Fragment extends Fragment {
     private int STOP_BUTTON_DISABLED_COLOR =  Color.argb((int)(.4f * 255), 0 ,0, 0);
@@ -54,14 +49,22 @@ public class Settings_Account_Fragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+            QuestionnaireActivity.setEnabled(false);
             LoginActivity.clearInfo();
             getActivity().finishAffinity();
-            QuestionnaireActivity.setEnabled(false);
             }
         });
 
         final Button stopButton = root.findViewById(R.id.stop_button);
         final EditText reasoning = root.findViewById(R.id.stop_reasoning);
+        final TextView reasoningLabel = root.findViewById(R.id.reasoning_label);
+        if(!LoginActivity.user.getAllowUserTermination()){
+            stopButton.setVisibility(View.GONE);
+            reasoning.setVisibility(View.GONE);
+            reasoningLabel.setVisibility(View.GONE);
+            return root;
+        }
+
         reasoning.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -93,16 +96,16 @@ public class Settings_Account_Fragment extends Fragment {
     private void stopResearch(final String reason){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
-        String url = PsychApp.serverUrl + "users/" + PsychApp.userId;
+        String url = PsychApp.serverUrl + "users/" + LoginActivity.user.getUserId();
 
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.DELETE, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        LoginActivity.clearInfo();
                         getActivity().finishAffinity();
                         QuestionnaireActivity.setEnabled(false);
-                        updateUserReason(userId, reason);
+                        updateUserReason(LoginActivity.user.getUserId(), reason);
+                        LoginActivity.clearInfo();
                     }
                 },
                 new Response.ErrorListener() {

@@ -23,6 +23,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.ui.ConsentActivity;
+import com.example.psychapp.ui.login.LoginActivity;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -55,7 +56,7 @@ public class IntroductionActivity extends AppCompatActivity {
         final boolean newUser = exitParam;
 
         try {
-            loadDescription((TextView) findViewById(R.id.descriptionText));
+            loadDescription((TextView) findViewById(R.id.descriptionText),(TextView) findViewById(R.id.nameText),(TextView) findViewById(R.id.emailText),(TextView) findViewById(R.id.phoneText));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -87,46 +88,67 @@ public class IntroductionActivity extends AppCompatActivity {
         });
     }
 
-    public void loadDescription(TextView description) throws IOException, ClassNotFoundException {
+    public void loadDescription(TextView description, TextView name, TextView email, TextView phone) throws IOException, ClassNotFoundException {
         if(PsychApp.isNetworkConnected(this)) {
-            setDescriptionFromDB(description);
+            setDescriptionFromDB(description, name, email, phone);
         } else {
-            loadDescriptionFromFile(description);
+            loadDescriptionFromFile(description, name, email, phone);
+        }
+        String text = description.getText().toString();
+        if(text.equals("null") || text.equals("")){
+            description.setText("No description available");
         }
     }
 
-    private void loadDescriptionFromFile(TextView description) throws IOException, ClassNotFoundException {
+    private void loadDescriptionFromFile(TextView description, TextView name, TextView email, TextView phone) throws IOException, ClassNotFoundException {
         FileInputStream fis = context.openFileInput(DESCRIPTION);
         ObjectInputStream is = new ObjectInputStream(fis);
-        description.setText((String) is.readObject());
+        String[] data = (String[]) is.readObject();
+        description.setText(data[0]);
+        name.setText(data[1]);
+        email.setText(data[2]);
+        phone.setText(data[3]);
         is.close();
         fis.close();
         Log.d("wtf", "Description loaded from Phone");
     }
 
-    public void saveDescriptionLocally(String description) throws IOException {
+    public void saveDescriptionLocally(String[] data) throws IOException {
         FileOutputStream fos = context.openFileOutput(DESCRIPTION, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
-        os.writeObject(description);
+        os.writeObject(data);
         os.close();
         fos.close();
         Log.d("wtf", "Description saved on Phone");
     }
 
-    public void setDescriptionFromDB(final TextView description) throws IOException {
+    public void setDescriptionFromDB(final TextView description,final TextView name,final TextView email,final TextView phone) throws IOException {
         final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = PsychApp.serverUrl + "researchers/"+PsychApp.researcherId;
+        String url = PsychApp.serverUrl + "researchers/"+ LoginActivity.user.getResearcherId();
         // prepare the Request
-        final String[] text = new String[1];
+        final String[] text = new String[4];
         final JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>(){
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            text[0] = (String) response.get("description");
-                            description.setText(text[0]);
-                            saveDescriptionLocally(text[0]);
-                            Log.d("wtf", text[0]);
+                            text[0] = response.getString("description");
+                            if(!text[0].equals("null")){
+                                description.setText(text[0]);
+                            }
+                            text[1] = response.getString("name");
+                            if(!text[1].equals("null")){
+                                name.setText(text[1]);
+                            }
+                            text[2] = response.getString("email");
+                            if(!text[2].equals("null")){
+                                email.setText(text[2]);
+                            }
+                            text[3] = response.getString("phone");
+                            if(!text[3].equals("null")){
+                                phone.setText(text[3]);
+                            }
+                            saveDescriptionLocally(text);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         } catch (IOException e) {
