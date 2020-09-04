@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.applications;
 
 import android.app.AlarmManager;
 import android.app.Application;
@@ -11,6 +11,8 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.util.Log;
 
+import com.example.psychapp.NotificationReceiver;
+import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 
 import java.io.FileOutputStream;
@@ -22,12 +24,12 @@ public class PsychApp extends Application {
     //public static final String serverUrl = "http://192.168.0.17:5050/";
     //public static final String serverUrl = "http://109.110.252.231:5050/";
     public static final String serverUrl = "http://10.0.2.2:5050/";
-    public static String user_name = "";
 
-    public static PsychApp instance;
     public static Context context;
     public static String CHANNEL_ID = "PsychAppNotifications";
     public static boolean DEBUG = true;
+
+    public static PsychApp instance;
 
     @Override
     public void onCreate() {

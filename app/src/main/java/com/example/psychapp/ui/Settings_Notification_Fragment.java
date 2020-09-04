@@ -19,14 +19,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
-import com.example.psychapp.PsychApp;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.InputMismatchException;
 
 public class Settings_Notification_Fragment extends Fragment {
     private static final String Settings_State = "settings_State";
@@ -171,17 +170,30 @@ public class Settings_Notification_Fragment extends Fragment {
                 public void onClick(View view) {
                     hours.clear();
                     minutes.clear();
+
                     hours.add(datePicker.getHour());
                     minutes.add(datePicker.getMinute());
 
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(System.currentTimeMillis());
-                    calendar.set(Calendar.HOUR_OF_DAY, hours.get(0));
-                    calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
+                    if (LoginActivity.user.getTestsPerDay() == 1) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(System.currentTimeMillis());
+                        calendar.set(Calendar.HOUR_OF_DAY, hours.get(0));
+                        calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
 
-                    PsychApp.instance.scheduleDailyNotification(calendar, 2612);
+                        PsychApp.instance.scheduleDailyNotification(calendar, 2612);
+                    } else {
+                        for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(System.currentTimeMillis());
+                            calendar.set(Calendar.HOUR_OF_DAY, hours.get(0) + LoginActivity.user.getTestsTimeInterval()*i);
+                            calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
 
-                    Log.d("Notification","reminder set for "+calendar);
+                            PsychApp.instance.scheduleDailyNotification(calendar, 2612 + i);
+                        }
+                    }
+
+                    storeValues();
+
                     getActivity().finish();
                 }
             });
@@ -192,17 +204,15 @@ public class Settings_Notification_Fragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        /*
-        try {
-            LoginActivity.loadUserInfo();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
+        if(LoginActivity.user != null)
+            storeValues();
+    }
+
+    public void storeValues() {
         if(LoginActivity.user == null)
             return;
-        */
+
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         int maxValue = LoginActivity.user.getTestsPerDay();

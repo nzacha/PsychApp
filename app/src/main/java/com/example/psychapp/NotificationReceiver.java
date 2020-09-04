@@ -20,6 +20,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.login.LoginActivity;
 
 import org.json.JSONObject;
@@ -27,6 +28,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.provider.Settings.System.getString;
 
 public class NotificationReceiver extends BroadcastReceiver {
     private static int count = 56748;
@@ -43,7 +46,6 @@ public class NotificationReceiver extends BroadcastReceiver {
             }
             LoginActivity.progress();
 
-            Log.d("wtf","Sending Notification");
             trackProgress(context, intent);
         } else {
             Log.d("wtf","Intent action not recognized");
@@ -55,20 +57,17 @@ public class NotificationReceiver extends BroadcastReceiver {
             sendUserProgressUpdate();
         }
 
-        if (LoginActivity.user.getAutomaticTermination()) {
-            if (LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress()) {
-                sendNotification(context, intent);
-            } else {
-                Log.d("wtf", "Notification supressed");
-            }
-        } else {
+        if (LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress()) {
             sendNotification(context, intent);
+            Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
+            QuestionnaireActivity.setEnabled(true);
+        } else {
+            Log.d("wtf", "Notification supressed");
         }
     }
 
     public void sendNotification(Context context, Intent intent){
-        Toast.makeText(context.getApplicationContext(), "Please answer some short questions", Toast.LENGTH_LONG).show();
-        QuestionnaireActivity.setEnabled(true);
+        Log.d("wtf","Sending Notification");
 
         Intent newIntent = new Intent(context, QuestionnaireActivity.class);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -78,18 +77,21 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder;
         builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)
-                .setContentTitle(context.getString(R.string.notification_title))
-                //.setContentText("Ignore this message " + count)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.notification_title))
                 .setContentIntent(pendingIntent)
-                //.setStyle(new NotificationCompat.BigTextStyle()
-                //        .bigText("Much longer text that cannot fit one line..."))
+                 //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setTimeoutAfter(10800000);
+        /*
         if(Build.VERSION.SDK_INT < 25) {
             builder.setSmallIcon(R.drawable.ic_stat_name);
         }else{
-            builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+            builder.setSmallIcon(R.drawable.ic_launcher);
         }
+        */
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(count, builder.build());
@@ -112,13 +114,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Map<String, String> params = new HashMap<>();
         params.put("progress", ""+LoginActivity.user.getProgress());
-        Log.d("wtf", params.toString());
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(PsychApp.DEBUG)
-                            Toast.makeText(PsychApp.context, "Progress sent to server successfully", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(PsychApp.context, "Progress sent to server successfully", Toast.LENGTH_LONG).show();
                         Log.d("wtf", "Updated user progress in server to "+ LoginActivity.user.getProgress());
                         Log.d("wtf", "Server responded with: "+ response.toString());
                     }
@@ -126,7 +126,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("wtf", "An Error occurred");
+                        Log.d("wtf", "An Error occurred: "+error.networkResponse.statusCode+": "+ error.networkResponse.data);
                     }
                 });
 

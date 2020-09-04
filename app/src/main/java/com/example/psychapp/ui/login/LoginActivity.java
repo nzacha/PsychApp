@@ -21,11 +21,12 @@ import androidx.lifecycle.Observer;
 
 import com.example.psychapp.IntroductionActivity;
 import com.example.psychapp.MainActivity;
-import com.example.psychapp.PsychApp;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.data.model.LoggedInUser;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
 
-import static com.example.psychapp.PsychApp.context;
+import static com.example.psychapp.applications.PsychApp.context;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String USER_INFO = "User_info";
@@ -74,8 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                     //stored user info is wrong
                     if(user!=null && loginResult.getError() == R.string.user_inactive){
                         LoginActivity.clearInfo();
-                        finishAffinity();
                         QuestionnaireActivity.setEnabled(false);
+                        finishAffinity();
                     }
                 } else if (loginResult.getSuccess() != null) {
                     //value is correct occurred
@@ -101,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
             loadingProgressBar.setVisibility(View.VISIBLE);
 
             if(PsychApp.isNetworkConnected(this)){
-                loginViewModel.setCode(""+user.getUserId());
+                loginViewModel.setCode(""+user.getCode());
                 LoginBackgroundTask loginTask = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
             } else {
                 try {
@@ -229,15 +230,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public static void progress(){
-        Log.d("wtf", "before progress: "+user.getProgress());
+        //Log.d("wtf", "before progress: "+user.getProgress());
         user.progress();
-        Log.d("wtf", "progress: "+user.getProgress());
+        Log.d("wtf", "progress: "+user.getProgress()+"/"+user.getMaxProgress());
         try {
             saveUserInfo(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d("wtf", "after save progress: "+user.getProgress());
+        //Log.d("wtf", "after save progress: "+user.getProgress());
 
         try {
             loadUserInfo();
@@ -246,10 +247,12 @@ public class LoginActivity extends AppCompatActivity {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        Log.d("wtf", "after load  progress: "+user.getProgress());
+        //Log.d("wtf", "after load  progress: "+user.getProgress());
     }
 
     public static void loadUserInfo() throws IOException, ClassNotFoundException {
+        if(!new File(USER_INFO).exists())
+            return;
         FileInputStream fis = context.openFileInput(USER_INFO);
         ObjectInputStream is = new ObjectInputStream(fis);
         user = (LoggedInUser) is.readObject();

@@ -9,11 +9,11 @@ import java.io.Serializable;
  */
 public class LoggedInUser implements Serializable {
     private int userId, researcherId;
-    private String displayName;
+    private String displayName, code;
     private int study_length, tests_per_day, tests_time_interval, progress, maxProgress;
     private boolean allow_individual_times, allow_user_termination, automatic_termination;
 
-    public LoggedInUser(int userId, String displayName, int researcherId, int study_length, int tests_per_day, int tests_time_interval, boolean allow_individual_times, boolean allow_user_termination, boolean automatic_termination, int progress, int maxProgress) {
+    public LoggedInUser(int userId, String displayName, int researcherId, int study_length, int tests_per_day, int tests_time_interval, boolean allow_individual_times, boolean allow_user_termination, boolean automatic_termination, int progress, int maxProgress, String code) {
         this.userId = userId;
         this.displayName = displayName;
         this.researcherId = researcherId;
@@ -25,6 +25,11 @@ public class LoggedInUser implements Serializable {
         this.automatic_termination = automatic_termination;
         this.progress = progress;
         this.maxProgress = maxProgress;
+        this.code = code;
+    }
+
+    public String getCode(){
+        return code;
     }
 
     public int getUserId() {
@@ -60,7 +65,7 @@ public class LoggedInUser implements Serializable {
     }
 
     public String toString(){
-        return String.format("id: %s, researcher_id: %s, progress: %s", userId, researcherId, progress);
+        return String.format("code: %s, researcher_id: %s, progress: %s", code, researcherId, progress);
     }
 
     public boolean isActive(){

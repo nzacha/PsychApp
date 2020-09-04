@@ -5,7 +5,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.psychapp.PsychApp;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
@@ -34,7 +33,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.psychapp.PsychApp.context;
+import static com.example.psychapp.applications.PsychApp.context;
 
 public class Settings_Account_Fragment extends Fragment {
     private int STOP_BUTTON_DISABLED_COLOR =  Color.argb((int)(.4f * 255), 0 ,0, 0);

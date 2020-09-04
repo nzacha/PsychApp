@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">PsychApp</string>
+    <string name="app_name" translatable="false">e4Pain</string>
     <string name="channel_name" translatable="false">PsychApp_Reminder</string>
     <string name="channel_description" translatable="false">PsychApp notification reminder</string>
     <string name="tab_account">Λογαριασμός</string>
@@ -27,7 +27,7 @@
     <string name="settings_button">Ρυθμίσεις ⚙</string>
     <string name="introduction_button">Περιγραφή έρευνας 📋</string>
     <string name="notification_time">Τι ώρα θα ξυπνήσεις αύριο;</string>
-    <string name="notification_time_title">Παρακαλώ επιλέξτε τις ώρες της έρευνας</string>
+    <string name="notification_time_title">"Ποιες ώρες είναι βολικές για εσένα για να απαντήσεις στις σύντομες ερωτήσεις; "</string>
     <string name="save_button">Αποθήκευση</string>
     <string name="settings">Ρυθμίσεις</string>
     <string name="logout">Έξοδος</string>

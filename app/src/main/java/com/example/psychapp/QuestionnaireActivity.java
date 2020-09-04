@@ -34,9 +34,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.ExitActivity;
 import com.example.psychapp.Question.QuestionType;
-import com.example.psychapp.data.model.LoggedInUser;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.login.LoginActivity;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -55,7 +54,7 @@ import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
 
-import static com.example.psychapp.PsychApp.context;
+import static com.example.psychapp.applications.PsychApp.context;
 
 public class QuestionnaireActivity extends AppCompatActivity {
     private static ArrayList<Question> questions = new ArrayList<Question>();
