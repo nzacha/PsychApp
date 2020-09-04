@@ -12,6 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.psychapp.QuestionnaireActivity;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.R;
 import com.example.psychapp.data.Exceptions;
@@ -55,8 +56,13 @@ public class LoginViewModel extends ViewModel {
                     public void onResponse(JSONObject response) {
                         try {
                             res = new Result.Success(new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), Integer.parseInt(response.get("researcherId").toString()), Integer.parseInt(response.get("study_length").toString()), Integer.parseInt(response.get("tests_per_day").toString()), Integer.parseInt(response.get("tests_time_interval").toString()), response.getBoolean("allow_individual_times"), response.getBoolean("allow_user_termination"), response.getBoolean("automatic_termination"), response.getInt("progress"), response.getInt("questions_total"), response.getString("code")));
+                            QuestionnaireActivity.sendLocalAnswers(Integer.parseInt(response.get("id").toString()));
                         } catch (JSONException e) {
                             res = new Result.Error(new IOException("Error with JSONObject", e));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
                         }
                         authenticateResult();
                     }
