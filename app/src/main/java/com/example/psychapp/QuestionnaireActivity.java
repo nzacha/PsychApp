@@ -521,7 +521,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
             TextView title = (TextView) convertView.findViewById(R.id.quiz_question_title);
             title.setText(question.question);
-
             return convertView;
         }
     }
