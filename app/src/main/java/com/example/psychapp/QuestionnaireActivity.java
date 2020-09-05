@@ -1,7 +1,5 @@
 package com.example.psychapp;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -52,6 +50,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -266,7 +265,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                             }
                         }
 
-                        questions.sort(new QuestionsComparator());
+                        Collections.sort(questions, new QuestionsComparator());
 
                         try {
                             saveQuestions();
