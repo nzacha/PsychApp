@@ -29,6 +29,8 @@ public class PsychApp extends Application {
     public static String CHANNEL_ID = "PsychAppNotifications";
     public static boolean DEBUG = true;
 
+    public static NotificationChannel channel;
+
     public static PsychApp instance;
 
     @Override
@@ -60,7 +62,7 @@ public class PsychApp extends Application {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             // Register the channel with the system; you can't change the importance
@@ -73,5 +75,14 @@ public class PsychApp extends Application {
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return (cm.getActiveNetworkInfo() != null) && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+
+    public static void clearNotifications(){
+        NotificationManager notificationManager = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(PsychApp.channel);
+            notificationManager.cancelAll();
+        }
     }
 }

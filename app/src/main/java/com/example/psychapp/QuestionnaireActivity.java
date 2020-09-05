@@ -1,5 +1,7 @@
 package com.example.psychapp;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -73,6 +75,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             if(!LoginActivity.user.isActive()) {
+                PsychApp.clearNotifications();
                 setEnabled(false);
                 clearQuestions();
                 LoginActivity.clearInfo();
@@ -111,7 +114,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     }
                 }
                 clearQuestions();
-                ExitActivity.exitApplication(PsychApp.context);
+                ExitActivity.exitApplication(context);
             }
         });
 
