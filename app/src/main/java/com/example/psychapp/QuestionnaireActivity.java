@@ -129,7 +129,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         quizQuestionList.setAdapter(adapter);
     }
 
-    private static void sendAnswerToServer(Question question, int userId){
+    private static void sendAnswerToServer(final Question question, int userId){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + userId;
@@ -164,22 +164,24 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     answer = "No answer given";
                 break;
         }
-        params.put("text", answer);
+        params.put("text", ""+answer);
         params.put("progress", ""+LoginActivity.user.getProgress());
+        final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+                    Log.d("wtf", "Sent to server: "+question);
                 }
             },
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    Log.d("wtf", "Answer: "+ finalAnswer + ", gave server response: "+error.toString());
                 }
             });
 
         // add it to the RequestQueue
-        //Log.d("wtf", "saved: "+question);
         queue.add(postRequest);
     }
 

@@ -7,55 +7,54 @@
     android:layout_height="match_parent"
     tools:context=".ui.main.MainActivityFragment">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
+    <Button
+        android:id="@+id/introduction_button"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:text="@string/introduction_button"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/quiz_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/quiz_button"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/questionnaire_button"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/settings_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/introduction_button" />
+
+    <Button
+        android:id="@+id/settings_button"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/settings_button"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/exit_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/quiz_button" />
+
+    <Button
+        android:id="@+id/exit_button"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:gravity="center|center_horizontal|center_vertical"
-        android:orientation="vertical"
+        android:text="@string/exit_button"
+        android:textSize="28sp"
         app:layout_constraintBottom_toTopOf="@+id/imageView3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
-
-        <Button
-            android:id="@+id/introduction_button"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:text="@string/introduction_button"
-            android:textSize="28sp" />
-
-        <Button
-            android:id="@+id/quiz_button"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/questionnaire_button"
-            android:textSize="28sp" />
-
-        <Button
-            android:id="@+id/settings_button"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/settings_button"
-            android:textSize="28sp" />
-
-        <Button
-            android:id="@+id/exit_button"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/exit_button"
-            android:textSize="28sp" />
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/settings_button" />
 
     <ImageView
         android:id="@+id/imageView3"
