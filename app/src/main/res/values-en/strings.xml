@@ -43,4 +43,8 @@
     <string name="phone">Phone</string>
     <string name="researcher">Researcher</string>
     <string name="description">Description</string>
+    <string name="thank_you_message">Thank you! you are ready! You can open the app again to view contact info, change the notification times or log out. Notifications will be sent to remind you to answer some small questions at the times you chose!</string>
+    <string name="thank_you">WELCOME</string>
+    <string name="confirm_termination">Are you sure you want to stop?</string>
+    <string name="termination_text">You won\'t be able to log back in and you will stop receiving notifications.</string>
 </resources>

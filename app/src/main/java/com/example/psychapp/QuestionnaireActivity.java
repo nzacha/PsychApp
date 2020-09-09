@@ -125,7 +125,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        retrieveQuestions(this, LoginActivity.user.getResearcherId());
+        retrieveQuestions(this, LoginActivity.user.getProjectId());
         QuizAdapter adapter = new QuizAdapter(this, questions);
         ListView quizQuestionList = findViewById(R.id.quiz_question_list);
         quizQuestionList.setAdapter(adapter);
@@ -135,7 +135,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + userId;
-
+        Log.d("wtf", PsychApp.serverUrl + "answers/" + question.id + "/" + userId);
+        
         Map<String, String> params = new HashMap<>();
         String answer = question.answer;
         switch (question.type){

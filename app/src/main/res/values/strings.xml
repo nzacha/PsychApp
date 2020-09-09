@@ -42,4 +42,8 @@
     <string name="researcher">Ερευνητής</string>
     <string name="phone">Τηλέφωνο</string>
     <string name="email">Email</string>
+    <string name="thank_you_message">Ευχαριστούμε! Είσαστε έτοιμοι! Μπορείτε να ξανανοίξετε την εφαμοργή για να δείτε την περιγραφή, να αλλάξετε τις ώρες των ειδοποιήσεων ή να αποσυνδεθείτε. Θα σας στέλνονται ειδοποιήσεις τις ώρες που εσείς έχετε διαλέξει για να απαντάτε το ερωτηματολόγιο.</string>
+    <string name="thank_you">ΚΑΛΩΣΟΡΙΣΑΤΕ</string>
+    <string name="confirm_termination">Είσαστε σίγουρος πως θέλετε να σταματήσετε την έρευνα;</string>
+    <string name="termination_text">Δέν θα μπορείτε να επανασυνδεθείτε και θα σταματήσετε να πέρνετε ειδοποιήσεις.</string>
 </resources>

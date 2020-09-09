@@ -55,7 +55,8 @@ public class LoginViewModel extends ViewModel {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            res = new Result.Success(new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), Integer.parseInt(response.get("researcherId").toString()), Integer.parseInt(response.get("study_length").toString()), Integer.parseInt(response.get("tests_per_day").toString()), Integer.parseInt(response.get("tests_time_interval").toString()), response.getBoolean("allow_individual_times"), response.getBoolean("allow_user_termination"), response.getBoolean("automatic_termination"), response.getInt("progress"), response.getInt("questions_total"), response.getString("code")));
+                            JSONObject project = response.getJSONObject("project");
+                            res = new Result.Success(new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), response.getInt("projectId"), project.getInt("study_length"), project.getInt("tests_per_day"), project.getInt("tests_time_interval"), project.getBoolean("allow_individual_times"), project.getBoolean("allow_user_termination"), project.getBoolean("automatic_termination"), response.getInt("progress"), response.getString("code")));
                             QuestionnaireActivity.sendLocalAnswers(Integer.parseInt(response.get("id").toString()));
                         } catch (JSONException e) {
                             res = new Result.Error(new IOException("Error with JSONObject", e));

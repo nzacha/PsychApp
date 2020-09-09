@@ -190,7 +190,7 @@ public class LoginActivity extends AppCompatActivity {
         //String welcome = "Welcome " + model.getDisplayName() + "!";
         String welcome = "Welcome!";
 
-        QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getResearcherId());
+        QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getProjectId());
 
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         startNextActivity(showConsent);

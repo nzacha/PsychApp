@@ -118,7 +118,7 @@ public class IntroductionActivity extends AppCompatActivity {
 
     public void setDescriptionFromDB(final TextView description,final TextView name,final TextView email,final TextView phone) throws IOException {
         final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = PsychApp.serverUrl + "researchers/"+ LoginActivity.user.getResearcherId();
+        String url = PsychApp.serverUrl + "projects/"+ LoginActivity.user.getProjectId();
         // prepare the Request
         final String[] text = new String[4];
         final JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -126,19 +126,20 @@ public class IntroductionActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
+                            JSONObject researcher = response.getJSONArray("researchers").getJSONObject(0);
                             text[0] = response.getString("description");
                             if(!text[0].equals("null")){
                                 description.setText(text[0]);
                             }
-                            text[1] = response.getString("name");
+                            text[1] = researcher.getString("name");
                             if(!text[1].equals("null")){
                                 name.setText(text[1]);
                             }
-                            text[2] = response.getString("email");
+                            text[2] = researcher.getString("email");
                             if(!text[2].equals("null")){
                                 email.setText(text[2]);
                             }
-                            text[3] = response.getString("phone");
+                            text[3] = researcher.getString("phone");
                             if(!text[3].equals("null")){
                                 phone.setText(text[3]);
                             }

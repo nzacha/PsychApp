@@ -1,5 +1,7 @@
 package com.example.psychapp.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -85,7 +87,16 @@ public class Settings_Account_Fragment extends Fragment {
         stopButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                stopResearch(reasoning.getText().toString());
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(getString(R.string.confirm_termination))
+                        .setMessage(getString(R.string.termination_text))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                stopResearch(reasoning.getText().toString());
+                            }})
+                        .setNegativeButton(android.R.string.no, null)
+                        .show();
             }
         });
 
@@ -101,10 +112,11 @@ public class Settings_Account_Fragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        getActivity().finishAffinity();
+                        PsychApp.clearNotifications();
                         QuestionnaireActivity.setEnabled(false);
                         updateUserReason(LoginActivity.user.getUserId(), reason);
                         LoginActivity.clearInfo();
+                        getActivity().finishAffinity();
                     }
                 },
                 new Response.ErrorListener() {

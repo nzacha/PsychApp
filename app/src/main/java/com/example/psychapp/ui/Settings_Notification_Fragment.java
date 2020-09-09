@@ -204,14 +204,14 @@ public class Settings_Notification_Fragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-
-        if(LoginActivity.user != null)
-            storeValues();
+        storeValues();
     }
 
     public void storeValues() {
-        if(LoginActivity.user == null)
+        if(LoginActivity.user == null) {
+            Log.d("wtf", "Can't store values, user is null");
             return;
+        }
 
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Settings_State, getActivity().MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
