@@ -149,15 +149,15 @@ public class QuestionView extends View{
                 radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                        int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
-                        QuestionnaireActivity.questions.get(index).answer = ""+index;
+                        int radioIndex = radioGroup.indexOfChild(radioGroup.findViewById(i));
+                        QuestionnaireActivity.questions.get(index).answer = ""+radioIndex;
                         //Log.d("value", "choice value changed to "+ question.answer);
-                        if (question.requestReason && index == radioGroup.getChildCount()-1){
+                        if (question.requestReason && radioIndex == radioGroup.getChildCount()-1){
                             reasoning.setVisibility(View.VISIBLE);
                         } else {
                             reasoning.setVisibility(View.GONE);
                         }
-                        Log.d("questions", "check listener: "+index);
+                        Log.d("questions", "check listener: "+radioIndex);
                     }
                 });
                 break;
