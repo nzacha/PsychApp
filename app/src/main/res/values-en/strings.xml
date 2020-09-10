@@ -47,4 +47,6 @@
     <string name="thank_you">WELCOME</string>
     <string name="confirm_termination">Are you sure you want to stop?</string>
     <string name="termination_text">You won\'t be able to log back in and you will stop receiving notifications.</string>
+    <string name="confirm_logout">Are you sure you want to logout?</string>
+    <string name="logout_text">You will need your unique identification code to log back in</string>
 </resources>

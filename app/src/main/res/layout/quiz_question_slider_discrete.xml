@@ -17,7 +17,7 @@
         android:textSize="32sp" />
 
     <SeekBar
-        android:id="@+id/question_seekbar"
+        android:id="@+id/question_seekbar_discrete"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,17 +1,16 @@
 package com.example.psychapp;
 
 
-import org.json.JSONArray;
-
 import java.io.Serializable;
 
-import static com.example.psychapp.Question.QuestionType.*;
+import static com.example.psychapp.Question.QuestionType.MULTIPLE_CHOICE;
+import static com.example.psychapp.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
+import static com.example.psychapp.Question.QuestionType.SLIDER;
+import static com.example.psychapp.Question.QuestionType.SLIDER_DISCRETE;
+import static com.example.psychapp.Question.QuestionType.TEXT;
 
-public class Question implements Serializable {
+public class Question implements Serializable{
     public static final String VERTICAL = "Vertical", HORIZONTAL = "Horizontal";
-    public static final int View_ID = 100;
-    public Question(String question, QuestionType type, JSONArray options) {
-    }
 
     public enum QuestionType{
         TEXT,
@@ -54,10 +53,14 @@ public class Question implements Serializable {
         this.id = id;
         this.question = question;
         this.level = level;
-        this.type = type;
+        if(level <= 1){
+            this.type =  SLIDER;
+        }else{
+            this.type =  SLIDER_DISCRETE;
+        }
     }
 
     public String toString(){
-        return id+") "+question+": "+type.name()+":"+level+" = "+answer;
+        return id+") "+question+": "+type.name()+":"+level+" = "+answer+".";
     }
 }

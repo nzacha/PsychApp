@@ -46,4 +46,6 @@
     <string name="thank_you">ΚΑΛΩΣΟΡΙΣΑΤΕ</string>
     <string name="confirm_termination">Είσαστε σίγουρος πως θέλετε να σταματήσετε την έρευνα;</string>
     <string name="termination_text">Δέν θα μπορείτε να επανασυνδεθείτε και θα σταματήσετε να πέρνετε ειδοποιήσεις.</string>
+    <string name="logout_text">Εάν αποσυνδεθείτε θα χρειαστεί κωδικός για να ξανασυνδεθείτε στην εφαρμογή.</string>
+    <string name="confirm_logout">Είστε σίγουρος πως θέλετε να αποσυνδεθείτε;</string>
 </resources>

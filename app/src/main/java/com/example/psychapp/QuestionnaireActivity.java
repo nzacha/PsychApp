@@ -58,7 +58,7 @@ import java.util.Map;
 import static com.example.psychapp.applications.PsychApp.context;
 
 public class QuestionnaireActivity extends AppCompatActivity {
-    private static ArrayList<Question> questions = new ArrayList<Question>();
+    public static ArrayList<Question> questions = new ArrayList<Question>();
     private static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions", ANSWERS = "Answers";
 
     @Override
@@ -102,6 +102,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(PsychApp.isNetworkConnected(context)) {
                     for (Question question : questions) {
+                        Log.d("value", "sent to server: "+question.toString());
                         sendAnswerToServer(question, LoginActivity.user.getUserId());
                     }
                     Log.d("wtf", "answers sent to server");
@@ -109,6 +110,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     try {
                         saveAnswers();
                     } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
@@ -126,9 +129,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         retrieveQuestions(this, LoginActivity.user.getProjectId());
+        /*
         QuizAdapter adapter = new QuizAdapter(this, questions);
         ListView quizQuestionList = findViewById(R.id.quiz_question_list);
         quizQuestionList.setAdapter(adapter);
+        */
+
+        LinearLayout quizQuestionList = findViewById(R.id.quiz_question_layout);
+        populateList(quizQuestionList, questions);
     }
 
     private static void sendAnswerToServer(final Question question, int userId){
@@ -207,7 +215,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         return file.exists();
     }
 
-    private static void retrieveQuestionsFromServer(Context context, int researcherId){
+    private static void retrieveQuestionsFromServer(final Context context, int researcherId){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "questions/" + researcherId;
@@ -254,11 +262,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                             }
                             //sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
-                                if(level==0) {
-                                    questions.add(new Question(id, question, QuestionType.SLIDER, 0));
-                                }else{
-                                    questions.add(new Question(id, question, QuestionType.SLIDER_DISCRETE, level));
-                                }
+                                questions.add(new Question(id, question, QuestionType.SLIDER, level));
                             }
                             //text
                             else{
@@ -288,7 +292,8 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static void sendLocalAnswers(int userId) throws IOException, ClassNotFoundException {
-        if(!new File(ANSWERS).exists())
+        File file = context.getFileStreamPath(ANSWERS);
+        if(!file.exists())
             return;
         FileInputStream fis = context.openFileInput(ANSWERS);
         ObjectInputStream is = new ObjectInputStream(fis);
@@ -311,10 +316,23 @@ public class QuestionnaireActivity extends AppCompatActivity {
         }
     }
 
-    private static void saveAnswers() throws IOException {
-        FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_APPEND);
+    private static void saveAnswers() throws IOException, ClassNotFoundException {
+        ArrayList<Question> answers = new ArrayList<Question>();
+        File file = context.getFileStreamPath(ANSWERS);
+        if(file.exists()) {
+            FileInputStream fis = context.openFileInput(ANSWERS);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            answers = (ArrayList<Question>) is.readObject();
+            is.close();
+            fis.close();
+        }
+        //Log.d("wtf", "before: "+answers.size());
+        for(Question question: questions)
+            answers.add(question);
+        //Log.d("wtf", "after: "+answers.size());
+        FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
-        os.writeObject(questions);
+        os.writeObject(answers);
         os.close();
         fos.close();
         Log.d("wtf", "Answers saved on Phone");
@@ -358,6 +376,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
     public static boolean isActive(){
         SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("status", false);
+    }
+
+    private void populateList(LinearLayout layout, ArrayList<Question> questions){
+        int index = 0;
+        for(Question question: questions){
+            QuestionView questionView = new QuestionView(PsychApp.context);
+            questionView.inflateInto(layout, question, index++);
+        }
     }
 
     class QuizAdapter extends ArrayAdapter<Question>{

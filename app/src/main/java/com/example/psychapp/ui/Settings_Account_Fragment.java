@@ -50,9 +50,16 @@ public class Settings_Account_Fragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-            QuestionnaireActivity.setEnabled(false);
-            LoginActivity.clearInfo();
-            getActivity().finishAffinity();
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getString(R.string.confirm_logout))
+                    .setMessage(getString(R.string.logout_text))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            logout();
+                        }})
+                    .setNegativeButton(android.R.string.no, null)
+                    .show();
             }
         });
 
@@ -101,6 +108,13 @@ public class Settings_Account_Fragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void logout(){
+        QuestionnaireActivity.setEnabled(false);
+        LoginActivity.clearInfo();
+        PsychApp.clearNotifications();
+        getActivity().finishAffinity();
     }
 
     private void stopResearch(final String reason){
