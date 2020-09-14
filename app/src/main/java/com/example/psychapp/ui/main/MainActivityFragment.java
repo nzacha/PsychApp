@@ -10,12 +10,11 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.ExitActivity;
-import com.example.psychapp.IntroductionActivity;
-import com.example.psychapp.QuestionnaireActivity;
+import com.example.psychapp.ExitActivity;
+import com.example.psychapp.ui.IntroductionActivity;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.R;
-import com.example.psychapp.SettingsTabbedActivity;
-import com.example.psychapp.ui.ConsentActivity;
+import com.example.psychapp.ui.settings.SettingsTabbedActivity;
 
 /**
  * A placeholder fragment containing a simple view.

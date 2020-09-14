@@ -12,7 +12,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.psychapp.QuestionnaireActivity;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.R;
 import com.example.psychapp.data.Exceptions;

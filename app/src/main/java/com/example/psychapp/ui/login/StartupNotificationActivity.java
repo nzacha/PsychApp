@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -6,7 +6,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.example.psychapp.ui.login.LoginActivity;
+import com.example.psychapp.R;
+import com.example.psychapp.ui.login.WelcomeScreen;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 public class StartupNotificationActivity extends AppCompatActivity {

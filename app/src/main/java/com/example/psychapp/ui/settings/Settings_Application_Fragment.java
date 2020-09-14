@@ -1,4 +1,4 @@
-package com.example.psychapp.ui;
+package com.example.psychapp.ui.settings;
 
 import android.os.Build;
 import android.os.Bundle;

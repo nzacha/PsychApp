@@ -19,10 +19,10 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
-import com.example.psychapp.IntroductionActivity;
-import com.example.psychapp.MainActivity;
+import com.example.psychapp.ui.IntroductionActivity;
+import com.example.psychapp.ui.main.MainActivity;
 import com.example.psychapp.applications.PsychApp;
-import com.example.psychapp.QuestionnaireActivity;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.data.model.LoggedInUser;
 
@@ -252,7 +252,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public static void loadUserInfo() throws IOException, ClassNotFoundException {
-        if(!new File(USER_INFO).exists())
+        File file = context.getFileStreamPath(USER_INFO);
+        if(!file.exists())
             return;
         FileInputStream fis = context.openFileInput(USER_INFO);
         ObjectInputStream is = new ObjectInputStream(fis);

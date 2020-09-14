@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.questions;
 
 
 import android.content.Context;
@@ -14,14 +14,9 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.io.Serializable;
-import java.util.InputMismatchException;
+import com.example.psychapp.R;
 
-import static com.example.psychapp.Question.QuestionType.MULTIPLE_CHOICE;
-import static com.example.psychapp.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
-import static com.example.psychapp.Question.QuestionType.SLIDER;
-import static com.example.psychapp.Question.QuestionType.SLIDER_DISCRETE;
-import static com.example.psychapp.Question.QuestionType.TEXT;
+import java.util.InputMismatchException;
 
 public class QuestionView extends View{
     private Context context;

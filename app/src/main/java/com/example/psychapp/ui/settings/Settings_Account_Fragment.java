@@ -1,4 +1,4 @@
-package com.example.psychapp.ui;
+package com.example.psychapp.ui.settings;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -25,8 +25,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.psychapp.ExitActivity;
 import com.example.psychapp.applications.PsychApp;
-import com.example.psychapp.QuestionnaireActivity;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 
@@ -114,7 +115,7 @@ public class Settings_Account_Fragment extends Fragment {
         QuestionnaireActivity.setEnabled(false);
         LoginActivity.clearInfo();
         PsychApp.clearNotifications();
-        getActivity().finishAffinity();
+        ExitActivity.exitApplication(getActivity());
     }
 
     private void stopResearch(final String reason){
@@ -130,7 +131,7 @@ public class Settings_Account_Fragment extends Fragment {
                         QuestionnaireActivity.setEnabled(false);
                         updateUserReason(LoginActivity.user.getUserId(), reason);
                         LoginActivity.clearInfo();
-                        getActivity().finishAffinity();
+                        ExitActivity.exitApplication(getActivity());
                     }
                 },
                 new Response.ErrorListener() {

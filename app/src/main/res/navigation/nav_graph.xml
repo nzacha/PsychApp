@@ -7,7 +7,7 @@
 
     <activity
         android:id="@+id/mainActivity"
-        android:name="com.example.psychapp.MainActivity"
+        android:name="com.example.psychapp.ui.main.MainActivity"
         android:label="activity_main"
         tools:layout="@layout/activity_main" >
         <action
@@ -29,11 +29,11 @@
     </activity>
     <activity
         android:id="@+id/settingsActivity"
-        android:name="com.example.psychapp.SettingsActivity"
+        android:name="com.example.psychapp.ui.settings.SettingsActivity"
         android:label="SettingsActivity" />
     <activity
         android:id="@+id/questionnaireActivity"
-        android:name="com.example.psychapp.QuestionnaireActivity"
+        android:name="com.example.psychapp.ui.questions.QuestionnaireActivity"
         android:label="content_scrolling"
         tools:layout="@layout/content_scrolling" />
 </navigation>

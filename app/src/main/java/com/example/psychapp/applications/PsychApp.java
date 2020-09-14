@@ -11,13 +11,9 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.example.psychapp.NotificationReceiver;
+import com.example.psychapp.ui.settings.NotificationReceiver;
 import com.example.psychapp.R;
-import com.example.psychapp.ui.login.LoginActivity;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Calendar;
 
 public class PsychApp extends Application {

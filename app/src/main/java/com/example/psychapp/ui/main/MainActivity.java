@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.main;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.example.psychapp.ui.main.SectionsPagerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.questions;
 
 public class QuestionsComparator implements java.util.Comparator<Question> {
 

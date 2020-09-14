@@ -1,13 +1,13 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.questions;
 
 
 import java.io.Serializable;
 
-import static com.example.psychapp.Question.QuestionType.MULTIPLE_CHOICE;
-import static com.example.psychapp.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
-import static com.example.psychapp.Question.QuestionType.SLIDER;
-import static com.example.psychapp.Question.QuestionType.SLIDER_DISCRETE;
-import static com.example.psychapp.Question.QuestionType.TEXT;
+import static com.example.psychapp.ui.questions.Question.QuestionType.MULTIPLE_CHOICE;
+import static com.example.psychapp.ui.questions.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
+import static com.example.psychapp.ui.questions.Question.QuestionType.SLIDER;
+import static com.example.psychapp.ui.questions.Question.QuestionType.SLIDER_DISCRETE;
+import static com.example.psychapp.ui.questions.Question.QuestionType.TEXT;
 
 public class Question implements Serializable{
     public static final String VERTICAL = "Vertical", HORIZONTAL = "Horizontal";

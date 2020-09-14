@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,8 +19,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
-import com.example.psychapp.ui.ConsentActivity;
+import com.example.psychapp.ui.login.ConsentActivity;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 

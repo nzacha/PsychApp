@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.settings;
 
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example;
+package com.example.psychapp;
 
 import android.app.Activity;
 import android.content.Context;

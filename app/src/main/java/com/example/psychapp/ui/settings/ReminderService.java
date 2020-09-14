@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.settings;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -9,8 +9,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+import com.example.psychapp.ui.main.MainActivity;
+import com.example.psychapp.R;
 
 import java.util.Calendar;
 

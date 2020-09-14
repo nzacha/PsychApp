@@ -1,7 +1,8 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.settings;
 
 import android.os.Bundle;
 
+import com.example.psychapp.R;
 import com.example.psychapp.ui.main.SettingsPagerAdapter;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

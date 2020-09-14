@@ -1,10 +1,13 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.psychapp.ExitActivity;
+import com.example.psychapp.R;
 
 public class WelcomeScreen extends AppCompatActivity {
 
@@ -17,7 +20,7 @@ public class WelcomeScreen extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                ExitActivity.exitApplication(getApplication());
             }
         });
     }

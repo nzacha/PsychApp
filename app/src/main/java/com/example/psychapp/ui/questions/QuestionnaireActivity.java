@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.questions;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -32,8 +31,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.ExitActivity;
-import com.example.psychapp.Question.QuestionType;
+import com.example.psychapp.ExitActivity;
+import com.example.psychapp.ui.questions.Question.QuestionType;
+import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -147,6 +147,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         
         Map<String, String> params = new HashMap<>();
         String answer = question.answer;
+
         switch (question.type){
             case SLIDER:
             case SLIDER_DISCRETE:
@@ -156,7 +157,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 } catch (NumberFormatException nfe){
                     temp = 0;
                 }
-                answer = ""+ (temp+1);
+                if (question.type == QuestionType.SLIDER_DISCRETE)
+                    temp++;
+                answer = ""+ (temp);
                 break;
             case MULTIPLE_CHOICE:
             case MULTIPLE_CHOICE_HORIZONTAL:

@@ -1,4 +1,4 @@
-package com.example.psychapp;
+package com.example.psychapp.ui.settings;
 
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -20,7 +20,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.ui.login.LoginActivity;
 
 import org.json.JSONObject;
@@ -28,8 +30,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.provider.Settings.System.getString;
 
 public class NotificationReceiver extends BroadcastReceiver {
     private static int count = 56748;

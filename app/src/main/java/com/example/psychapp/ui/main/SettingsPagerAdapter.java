@@ -1,7 +1,6 @@
 package com.example.psychapp.ui.main;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -10,9 +9,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.example.psychapp.R;
-import com.example.psychapp.ui.Settings_Account_Fragment;
-import com.example.psychapp.ui.Settings_Application_Fragment;
-import com.example.psychapp.ui.Settings_Notification_Fragment;
+import com.example.psychapp.ui.settings.Settings_Account_Fragment;
+import com.example.psychapp.ui.settings.Settings_Notification_Fragment;
 
 import java.util.InputMismatchException;
 

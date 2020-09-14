@@ -1,4 +1,4 @@
-package com.example.psychapp.ui;
+package com.example.psychapp.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
