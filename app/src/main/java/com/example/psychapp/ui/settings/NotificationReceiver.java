@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationReceiver extends BroadcastReceiver {
-    private static int count = 56748;
+    private static int notification_code = 56748, reminder_code = 9876;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -47,6 +47,15 @@ public class NotificationReceiver extends BroadcastReceiver {
             LoginActivity.progress();
 
             trackProgress(context, intent);
+        } else if(intent.getAction().equals("reminder")) {
+            try {
+                LoginActivity.loadUserInfo();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            sendReminder(context, intent);
         } else {
             Log.d("wtf","Intent action not recognized");
         }
@@ -66,7 +75,52 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 
+    public void sendReminder(Context context, Intent intent){
+        if(!QuestionnaireActivity.isActive()){
+            Log.d("wtf","Reminder surpressed");
+            return;
+        }
+        Log.d("wtf","Sending Reminder");
+
+        Intent newIntent = new Intent(context, QuestionnaireActivity.class);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntentWithParentStack(newIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(intent.getExtras().getInt("code"), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder;
+        builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.notification_reminder))
+                .setContentIntent(pendingIntent)
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setTimeoutAfter(10800000);
+        /*
+        if(Build.VERSION.SDK_INT < 25) {
+            builder.setSmallIcon(R.drawable.ic_stat_name);
+        }else{
+            builder.setSmallIcon(R.drawable.ic_launcher);
+        }
+        */
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(reminder_code, builder.build());
+
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(500);
+        }
+    }
+
     public void sendNotification(Context context, Intent intent){
+        PsychApp.clearNotifications();
         Log.d("wtf","Sending Notification");
 
         Intent newIntent = new Intent(context, QuestionnaireActivity.class);
@@ -94,8 +148,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         */
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-        notificationManager.notify(count, builder.build());
-        count++;
+        notificationManager.notify(notification_code, builder.build());
 
         Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 500 milliseconds
@@ -105,6 +158,8 @@ public class NotificationReceiver extends BroadcastReceiver {
             //deprecated in API 26
             v.vibrate(500);
         }
+
+        PsychApp.instance.scheduleNotificationReminder(reminder_code);
     }
 
     private void sendUserProgressUpdate(){

@@ -24,7 +24,7 @@ import com.example.psychapp.ui.main.MainActivity;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.R;
-import com.example.psychapp.data.model.LoggedInUser;
+import com.example.psychapp.data.LoggedInUser;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -2,7 +2,7 @@ package com.example.psychapp.ui.login;
 
 import androidx.annotation.Nullable;
 
-import com.example.psychapp.data.model.LoggedInUser;
+import com.example.psychapp.data.LoggedInUser;
 
 /**
  * Authentication result : success (user details) or error message.

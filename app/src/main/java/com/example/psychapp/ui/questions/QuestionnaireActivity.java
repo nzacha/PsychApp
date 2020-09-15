@@ -116,6 +116,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     }
                 }
                 clearQuestions();
+                PsychApp.clearNotifications();
                 ExitActivity.exitApplication(context);
             }
         });

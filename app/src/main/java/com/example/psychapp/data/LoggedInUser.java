@@ -1,4 +1,4 @@
-package com.example.psychapp.data.model;
+package com.example.psychapp.data;
 
 import android.util.Log;
 

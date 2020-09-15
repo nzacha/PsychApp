@@ -52,4 +52,5 @@
     <string name="slider_discrete_footer_left">Καθόλου</string>
     <string name="slider_footer_left" translatable="false">0%</string>
     <string name="slider_footer_right" translatable="false">100%</string>
+    <string name="notification_reminder">Σε υπενθυμίζω να συμπληρώσεις τις ερωτήσεις στην εφαρμογή μας</string>
 </resources>

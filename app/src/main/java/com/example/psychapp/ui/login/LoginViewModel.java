@@ -17,7 +17,7 @@ import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.R;
 import com.example.psychapp.data.Exceptions;
 import com.example.psychapp.data.Result;
-import com.example.psychapp.data.model.LoggedInUser;
+import com.example.psychapp.data.LoggedInUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
