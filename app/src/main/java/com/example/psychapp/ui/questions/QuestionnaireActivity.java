@@ -65,6 +65,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        PsychApp.clearNotifications();
         if(LoginActivity.user ==null){
             try {
                 LoginActivity.loadUserInfo();
@@ -74,7 +75,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             if(!LoginActivity.user.isActive()) {
-                PsychApp.clearNotifications();
                 setEnabled(false);
                 clearQuestions();
                 LoginActivity.clearInfo();
