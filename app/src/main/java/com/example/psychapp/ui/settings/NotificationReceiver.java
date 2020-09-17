@@ -71,6 +71,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             QuestionnaireActivity.setEnabled(true);
         } else {
+            PsychApp.clearNotifications();
             Log.d("wtf", "Notification suppressed");
         }
     }
