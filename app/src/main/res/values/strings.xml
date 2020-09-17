@@ -26,7 +26,7 @@
     <string name="exit_button">Έξοδος 🚪</string>
     <string name="settings_button">Ρυθμίσεις ⚙</string>
     <string name="introduction_button">Περιγραφή έρευνας 📋</string>
-    <string name="notification_time">Τι ώρα ξύπνησες σήμερα / θα ξυπνήσεις αύριο;</string>
+    <string name="notification_time">Ποιά ώρα είναι βολική για εσένα, για να απαντήσεις στις ερωτήσεις, για πρώτη φορά στην ημέρα σου (κατα προτίμηση μόλις ξυπνήσεις);</string>
     <string name="notification_time_title">"Ποιες ώρες είναι βολικές για εσένα για να απαντήσεις στις σύντομες ερωτήσεις; "</string>
     <string name="save_button">Αποθήκευση</string>
     <string name="settings">Ρυθμίσεις</string>

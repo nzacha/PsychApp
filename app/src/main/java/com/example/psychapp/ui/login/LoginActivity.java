@@ -19,12 +19,23 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.psychapp.data.Exceptions;
+import com.example.psychapp.data.Result;
 import com.example.psychapp.ui.IntroductionActivity;
 import com.example.psychapp.ui.main.MainActivity;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.data.LoggedInUser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else if (loginResult.getSuccess() != null) {
                     //value is correct occurred
                     user = loginResult.getSuccess();
+                    PsychApp.clearNotifications();
                     try {
                         saveUserInfo(user);
                     } catch (IOException e) {

@@ -48,7 +48,8 @@ public class PsychApp extends Application {
         alarmIntent.putExtra("code", requestCode);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        Log.d("wtf","Alarm set for "+String.format("%02d:%02d:%s", calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM")+" daily.");
+        //Log.d("wtf", calendar.toString());
+        Log.d("wtf","Alarm set for "+String.format("%02d:%02d:%s (%d, %02d)", calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM", calendar.get(Calendar.DAY_OF_YEAR), calendar.get(Calendar.HOUR_OF_DAY))+" daily.");
     }
 
     public void scheduleNotificationReminder(int requestCode){

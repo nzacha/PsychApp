@@ -61,7 +61,7 @@ public class Settings_Notification_Fragment extends Fragment {
         minuteSpinner.setDisplayedValues(new String[]{"00","15","30","45"});
         minuteSpinner.setValue(1);
 
-        notificationLabel = root.findViewById(R.id.notification_label);
+        notificationLabel = root.findViewById(R.id.notificationTimeTitle);
         notificationTime = root.findViewById(R.id.notification_time);
         notificationTimes = root.findViewById(R.id.notifications);
 
@@ -188,7 +188,7 @@ public class Settings_Notification_Fragment extends Fragment {
                             calendar.set(Calendar.HOUR_OF_DAY, hours.get(0) + LoginActivity.user.getTestsTimeInterval()*i);
                             calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
 
-                            PsychApp.instance.scheduleDailyNotification(calendar, 2612 + i);
+                            PsychApp.instance.scheduleDailyNotification(calendar, 2612+i);
                         }
                     }
 

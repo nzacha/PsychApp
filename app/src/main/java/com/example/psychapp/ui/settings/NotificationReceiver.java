@@ -36,7 +36,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals("alarm")) {
+        if (intent.getAction().equals("alarm")) {
             try {
                 LoginActivity.loadUserInfo();
             } catch (IOException e) {
@@ -47,7 +47,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             LoginActivity.progress();
 
             trackProgress(context, intent);
-        } else if(intent.getAction().equals("reminder")) {
+        } else if (intent.getAction().equals("reminder")) {
             try {
                 LoginActivity.loadUserInfo();
             } catch (IOException e) {
@@ -57,32 +57,33 @@ public class NotificationReceiver extends BroadcastReceiver {
             }
             sendReminder(context, intent);
         } else {
-            Log.d("wtf","Intent action not recognized");
+            Log.d("wtf", "Intent action not recognized");
         }
     }
 
-    public void trackProgress(Context context, Intent intent){
-        if(PsychApp.isNetworkConnected(PsychApp.context)) {
+    public void trackProgress(Context context, Intent intent) {
+        if (PsychApp.isNetworkConnected(PsychApp.context)) {
             sendUserProgressUpdate();
         }
 
-        if (LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress()) {
+        if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
             sendNotification(context, intent);
             Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             QuestionnaireActivity.setEnabled(true);
         } else {
-            Log.d("wtf", "Notification supressed");
+            Log.d("wtf", "Notification suppressed");
         }
     }
 
-    public void sendReminder(Context context, Intent intent){
-        if(!QuestionnaireActivity.isActive()){
-            Log.d("wtf","Reminder surpressed");
+    public void sendReminder(Context context, Intent intent) {
+        if (!QuestionnaireActivity.isActive()) {
+            Log.d("wtf", "Reminder suppressed");
             return;
         }
-        Log.d("wtf","Sending Reminder");
+        Log.d("wtf", "Sending Reminder");
 
         Intent newIntent = new Intent(context, QuestionnaireActivity.class);
+        newIntent.putExtra("notification_origin", true);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntentWithParentStack(newIntent);
@@ -119,9 +120,9 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
     }
 
-    public void sendNotification(Context context, Intent intent){
+    public void sendNotification(Context context, Intent intent) {
         PsychApp.clearNotifications();
-        Log.d("wtf","Sending Notification");
+        Log.d("wtf", "Sending Notification");
 
         Intent newIntent = new Intent(context, QuestionnaireActivity.class);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -134,7 +135,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(context.getString(R.string.notification_title))
                 .setContentIntent(pendingIntent)
-                 //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.ic_stat_name)
@@ -162,26 +163,26 @@ public class NotificationReceiver extends BroadcastReceiver {
         PsychApp.instance.scheduleNotificationReminder(reminder_code);
     }
 
-    private void sendUserProgressUpdate(){
+    private void sendUserProgressUpdate() {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
         String url = PsychApp.serverUrl + "users/progress/" + LoginActivity.user.getUserId();
 
         Map<String, String> params = new HashMap<>();
-        params.put("progress", ""+LoginActivity.user.getProgress());
+        params.put("progress", "" + LoginActivity.user.getProgress());
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         //Toast.makeText(PsychApp.context, "Progress sent to server successfully", Toast.LENGTH_LONG).show();
-                        Log.d("wtf", "Updated user progress in server to "+ LoginActivity.user.getProgress());
-                        Log.d("wtf", "Server responded with: "+ response.toString());
+                        Log.d("wtf", "Updated user progress in server to " + LoginActivity.user.getProgress());
+                        Log.d("wtf", "Server responded with: " + response.toString());
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("wtf", "An Error occurred: "+error.networkResponse.statusCode+": "+ error.networkResponse.data);
+                        Log.d("wtf", "An Error occurred: " + error.networkResponse.statusCode + ": " + error.networkResponse.data);
                     }
                 });
 
@@ -189,7 +190,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         queue.add(postRequest);
     }
 
-    public void startService(Context context){
+    public void startService(Context context) {
         Intent serviceintent = new Intent(context, ReminderService.class);
         context.startService(serviceintent);
     }

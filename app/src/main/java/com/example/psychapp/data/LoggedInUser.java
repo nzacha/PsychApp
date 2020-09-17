@@ -11,9 +11,9 @@ public class LoggedInUser implements Serializable {
     private int userId, projectId;
     private String displayName, code;
     private int study_length, tests_per_day, tests_time_interval, progress, maxProgress;
-    private boolean allow_individual_times, allow_user_termination, automatic_termination;
+    private boolean allow_individual_times, allow_user_termination, automatic_termination, enabled;
 
-    public LoggedInUser(int userId, String displayName, int projectId, int study_length, int tests_per_day, int tests_time_interval, boolean allow_individual_times, boolean allow_user_termination, boolean automatic_termination, int progress, String code) {
+    public LoggedInUser(int userId, String displayName, int projectId, int study_length, int tests_per_day, int tests_time_interval, boolean allow_individual_times, boolean allow_user_termination, boolean automatic_termination, int progress, String code, boolean enabled) {
         this.userId = userId;
         this.displayName = displayName;
         this.projectId = projectId;
@@ -26,6 +26,7 @@ public class LoggedInUser implements Serializable {
         this.progress = progress;
         this.maxProgress = study_length * tests_per_day;
         this.code = code;
+        this.enabled = enabled;
     }
 
     public String getCode(){
@@ -69,6 +70,6 @@ public class LoggedInUser implements Serializable {
     }
 
     public boolean isActive(){
-        return progress < maxProgress;
+        return enabled;
     }
 }
