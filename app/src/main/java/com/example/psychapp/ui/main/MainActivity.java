@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Press Introduction to view helpful information", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, getString(R.string.main_activity_help), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });

@@ -53,4 +53,7 @@
     <string name="slider_footer_left" translatable="false">0%</string>
     <string name="slider_footer_right" translatable="false">100%</string>
     <string name="notification_reminder">Σε υπενθυμίζω να συμπληρώσεις τις ερωτήσεις στην εφαρμογή μας</string>
+    <string name="main_activity_help">Πατήστε \"Περιγραφή\" για περισσότερες πληροφορίες</string>
+    <string name="questionnaire_help">Απαντήστε τις ερωτήσεις και ακολούθως \"Αποθήκευση\" για να τερματίσετε το ερωτηματολόγιο</string>
+    <string name="deactivation_title">Ο λογαριασμός σας απενεργοποιήθηκε, εάν δεν ολοκληρώσατε την έρευνα επικοινωνήστε με τον υπέυθυνο ερευνητή</string>
 </resources>

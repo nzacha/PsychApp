@@ -93,7 +93,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Answer the questions and press send to finish", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, getString(R.string.questionnaire_help), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });

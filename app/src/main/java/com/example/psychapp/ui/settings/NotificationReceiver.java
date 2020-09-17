@@ -22,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
+import com.example.psychapp.ui.login.LogoActivity;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.ui.login.LoginActivity;
 
@@ -73,6 +74,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         } else {
             PsychApp.clearNotifications();
             Log.d("wtf", "Notification suppressed");
+            sendDeactivationNotification(context, intent);
         }
     }
 
@@ -194,5 +196,41 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void startService(Context context) {
         Intent serviceintent = new Intent(context, ReminderService.class);
         context.startService(serviceintent);
+    }
+
+
+    public void sendDeactivationNotification(Context context, Intent intent) {
+        PsychApp.clearNotifications();
+        Log.d("wtf", "Sending Deactivation Notification");
+
+        Intent newIntent = new Intent(context, LogoActivity.class);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntentWithParentStack(newIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(intent.getExtras().getInt("code"), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder;
+        builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.deactivation_title))
+                .setContentIntent(pendingIntent)
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_stat_name);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(notification_code, builder.build());
+
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(500);
+        }
+
+        PsychApp.instance.scheduleNotificationReminder(reminder_code);
     }
 }

@@ -52,4 +52,7 @@
     <string name="slider_discrete_footer_right">Very Often</string>
     <string name="slider_discrete_footer_left">Very Rarely</string>
     <string name="notification_reminder">I am reminding you to please answer the questions in our application!</string>
+    <string name="main_activity_help">Press Introduction to view helpful information</string>
+    <string name="questionnaire_help">Answer the questions and press send to finish</string>
+    <string name="deactivation_title">This account was deactivated, please contact the research supervisor</string>
 </resources>
