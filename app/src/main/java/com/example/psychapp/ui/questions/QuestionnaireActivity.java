@@ -68,7 +68,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(LoginActivity.user ==null){
+        if(LoginActivity.user == null){
             try {
                 LoginActivity.loadUserInfo();
             } catch (IOException e) {
@@ -80,8 +80,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
         PsychApp.clearNotifications();
 
         Bundle extras = getIntent().getExtras();
-        if(extras.getBoolean("notification_origin")){
-            updateUserData();
+        if(extras != null){
+            if(extras.getBoolean("notification_origin"))
+                updateUserData();
         }
         setContentView(R.layout.activity_questionnaire);
 
