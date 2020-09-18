@@ -79,7 +79,7 @@ public class Settings_Notification_Fragment extends Fragment {
 
         if (LoginActivity.user.getTestsPerDay() > 1  && LoginActivity.user.getAllowIndividualTimes()) {
             notificationTime.setVisibility(View.INVISIBLE);
-            notificationLabel.setVisibility(View.INVISIBLE);
+            notificationLabel.setText(R.string.notification_time_title);
 
             RadioButton radio;
             for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){

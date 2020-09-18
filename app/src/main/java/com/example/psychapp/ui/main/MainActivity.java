@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.example.psychapp.ui.main.SectionsPagerAdapter;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 

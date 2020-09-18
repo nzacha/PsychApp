@@ -119,19 +119,12 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     }
                 }
                 clearQuestions();
+                retrieveQuestions(context, LoginActivity.user.getProjectId());
                 PsychApp.clearNotifications();
                 ExitActivity.exitApplication(context);
             }
         });
 
-        //Log.d("wtf",questions.toString());
-        try {
-            LoginActivity.loadUserInfo();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         retrieveQuestions(this, LoginActivity.user.getProjectId());
         /*
         QuizAdapter adapter = new QuizAdapter(this, questions);
@@ -364,7 +357,10 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static void clearQuestions(){
-        questions.clear();
+        for(Question question: questions){
+            question.answer = "";
+            question.hint ="";
+        }
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
