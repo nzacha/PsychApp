@@ -79,11 +79,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
         }
         PsychApp.clearNotifications();
 
-        Bundle extras = getIntent().getExtras();
-        if(extras != null){
-            if(extras.getBoolean("notification_origin"))
-                updateUserData();
-        }
         setContentView(R.layout.activity_questionnaire);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -387,73 +382,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
             QuestionView questionView = new QuestionView(PsychApp.context);
             questionView.inflateInto(layout, question, index++);
         }
-    }
-
-    private void updateUserData(){
-        if(!PsychApp.isNetworkConnected(context))
-            return;
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
-        String url = PsychApp.serverUrl + "users/" + LoginActivity.user.getCode();
-
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            QuestionnaireActivity.sendLocalAnswers(Integer.parseInt(response.get("id").toString()));
-                            JSONObject project = response.getJSONObject("project");
-                            LoginActivity.user = new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), response.getInt("projectId"), project.getInt("study_length"), project.getInt("tests_per_day"), project.getInt("tests_time_interval"), project.getBoolean("allow_individual_times"), project.getBoolean("allow_user_termination"), project.getBoolean("automatic_termination"), response.getInt("progress"), response.getString("code"), response.getBoolean("isActive"));
-                            if(!LoginActivity.user.isActive()) {
-                                setEnabled(false);
-                                clearQuestions();
-                                LoginActivity.clearInfo();
-                                finishAffinity();
-                            }
-                        } catch (JSONException e) {
-                            try {
-                                throw new IOException("Error with JSONObject", e);
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        switch(error.networkResponse.statusCode){
-                            case 400:
-                                try {
-                                    throw new Exceptions.UserInactive();
-                                } catch (Exceptions.UserInactive userInactive) {
-                                    userInactive.printStackTrace();
-                                }
-                                break;
-                            case 404:
-                                try {
-                                    throw new Exceptions.InvalidCredentials();
-                                } catch (Exceptions.InvalidCredentials invalidCredentials) {
-                                    invalidCredentials.printStackTrace();
-                                }
-                                break;
-                            default:
-                                Log.d("wtf",error.networkResponse.statusCode+": "+error.networkResponse.data);
-                                try {
-                                    throw new Exception();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                        }
-                    }
-                });
-
-        // add it to the RequestQueue
-        queue.add(postRequest);
     }
 
     class QuizAdapter extends ArrayAdapter<Question>{

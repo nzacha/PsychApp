@@ -72,4 +72,8 @@ public class LoggedInUser implements Serializable {
     public boolean isActive(){
         return enabled;
     }
+
+    public void deactivate(){
+        enabled = false;
+    }
 }

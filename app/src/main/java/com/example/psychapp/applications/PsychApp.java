@@ -39,7 +39,7 @@ public class PsychApp extends Application {
     }
 
     public void scheduleDailyNotification(Calendar calendar, int requestCode){
-        if(calendar.get(Calendar.HOUR_OF_DAY) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY))
+        if(calendar.get(Calendar.HOUR_OF_DAY) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY) && calendar.get(Calendar.DATE) <= Calendar.getInstance().get(Calendar.DATE))
             calendar.add(Calendar.DATE,1);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

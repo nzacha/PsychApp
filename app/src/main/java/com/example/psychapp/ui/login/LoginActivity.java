@@ -1,6 +1,8 @@
 package com.example.psychapp.ui.login;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -19,12 +21,24 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
-import com.example.psychapp.R;
-import com.example.psychapp.applications.PsychApp;
-import com.example.psychapp.data.LoggedInUser;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.psychapp.data.Exceptions;
+import com.example.psychapp.data.Result;
 import com.example.psychapp.ui.IntroductionActivity;
 import com.example.psychapp.ui.main.MainActivity;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
+import com.example.psychapp.R;
+import com.example.psychapp.data.LoggedInUser;
+import com.example.psychapp.ui.settings.NotificationReceiver;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,14 +88,19 @@ public class LoginActivity extends AppCompatActivity {
                     //error occurred
                     showLoginFailed(loginResult.getError());
                     //stored user info is wrong
-                    if(user!=null){ // && (loginResult.getError() == R.string.user_inactive || loginResult.getError() == R.string.login_failed))
+                    if(user!=null && loginResult.getError() == R.string.user_inactive){
                         LoginActivity.clearInfo();
                         QuestionnaireActivity.setEnabled(false);
                         finishAffinity();
                     }
                 } else if (loginResult.getSuccess() != null) {
                     //value is correct occurred
-                    user = loginResult.getSuccess();
+                    if(user!=null) {
+                        LoggedInUser newData = loginResult.getSuccess();
+                        user = new LoggedInUser(user.getUserId(), user.getDisplayName(), newData.getProjectId(), newData.getStudyLength(), newData.getTestsPerDay(), newData.getTestsTimeInterval(), newData.getAllowIndividualTimes(), newData.getAllowUserTermination(), newData.getAutomaticTermination(), user.getProgress(), user.getCode(), newData.isActive());
+                    } else {
+                        user = loginResult.getSuccess();
+                    }
                     PsychApp.clearNotifications();
                     try {
                         saveUserInfo(user);
@@ -96,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        //user data exists
+        //user exists
         if(!savedData){
             Log.d("wtf","code available");
             codeEditText.setVisibility(View.GONE);
@@ -104,6 +123,7 @@ public class LoginActivity extends AppCompatActivity {
             loadingProgressBar.setVisibility(View.VISIBLE);
 
             if(PsychApp.isNetworkConnected(this)){
+                NotificationReceiver.sendUserProgressUpdate();
                 loginViewModel.setCode(""+user.getCode());
                 LoginBackgroundTask loginTask = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
             } else {
@@ -188,10 +208,25 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateUiWithUser(LoggedInUser model, boolean showConsent) {
+        QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getProjectId());
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            if(extras.getBoolean("notification_origin")){
+                Intent newIntent = new Intent(context, QuestionnaireActivity.class);
+                TaskStackBuilder.create(PsychApp.context)
+                        .addNextIntentWithParentStack(newIntent)
+                        .startActivities();
+
+                //Complete and destroy login activity once successful
+                setResult(Activity.RESULT_OK);
+                finish();
+                return;
+            }
+        }
+
         //String welcome = "Welcome " + model.getDisplayName() + "!";
         String welcome = "Welcome!";
-
-        QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getProjectId());
 
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         startNextActivity(showConsent);

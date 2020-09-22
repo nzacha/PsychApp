@@ -22,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
+import com.example.psychapp.data.LoggedInUser;
 import com.example.psychapp.ui.login.LogoActivity;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.ui.login.LoginActivity;
@@ -37,25 +38,19 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        try {
+            LoginActivity.loadUserInfo();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         if (intent.getAction().equals("alarm")) {
-            try {
-                LoginActivity.loadUserInfo();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
             LoginActivity.progress();
 
             trackProgress(context, intent);
         } else if (intent.getAction().equals("reminder")) {
-            try {
-                LoginActivity.loadUserInfo();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
             sendReminder(context, intent);
         } else {
             Log.d("wtf", "Intent action not recognized");
@@ -85,7 +80,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
         Log.d("wtf", "Sending Reminder");
 
-        Intent newIntent = new Intent(context, QuestionnaireActivity.class);
+        Intent newIntent = new Intent(context, LoginActivity.class);
         newIntent.putExtra("notification_origin", true);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -127,7 +122,8 @@ public class NotificationReceiver extends BroadcastReceiver {
         PsychApp.clearNotifications();
         Log.d("wtf", "Sending Notification");
 
-        Intent newIntent = new Intent(context, QuestionnaireActivity.class);
+        Intent newIntent = new Intent(context, LoginActivity.class);
+        newIntent.putExtra("notification_origin", true);
         //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addNextIntentWithParentStack(newIntent);
@@ -166,7 +162,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         PsychApp.instance.scheduleNotificationReminder(reminder_code);
     }
 
-    private void sendUserProgressUpdate() {
+    public static void sendUserProgressUpdate() {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
         String url = PsychApp.serverUrl + "users/progress/" + LoginActivity.user.getUserId();
@@ -201,6 +197,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     public void sendDeactivationNotification(Context context, Intent intent) {
         PsychApp.clearNotifications();
+        QuestionnaireActivity.setEnabled(false);
+        LoginActivity.user.deactivate();
+
         Log.d("wtf", "Sending Deactivation Notification");
 
         Intent newIntent = new Intent(context, LogoActivity.class);
