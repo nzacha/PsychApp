@@ -120,7 +120,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             }
         });
 
-        retrieveQuestions(this, LoginActivity.user.getProjectId());
+        //retrieveQuestions(this, LoginActivity.user.getProjectId());
         /*
         QuizAdapter adapter = new QuizAdapter(this, questions);
         ListView quizQuestionList = findViewById(R.id.quiz_question_list);
