@@ -96,4 +96,12 @@ public class PsychApp extends Application {
             notificationManager.cancelAll();
         }
     }
+
+    public static void cancelAlarmNotifications(){
+        for(int i=0; i<6; i++) {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 2612+i, new Intent(context, NotificationReceiver.class), 0);
+            alarmManager.cancel(pendingIntent);
+        }
+    }
 }

@@ -199,6 +199,8 @@ public class NotificationReceiver extends BroadcastReceiver {
         PsychApp.clearNotifications();
         QuestionnaireActivity.setEnabled(false);
         LoginActivity.user.deactivate();
+        LoginActivity.clearInfo();
+        PsychApp.cancelAlarmNotifications();
 
         Log.d("wtf", "Sending Deactivation Notification");
 
