@@ -9,11 +9,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.psychapp.R;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.example.psychapp.ui.main.SectionsPagerAdapter;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,5 +40,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //QuestionnaireActivity.setEnabled(true);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, 1);
+        PsychApp.instance.scheduleDailyNotification(cal,145);
     }
 }

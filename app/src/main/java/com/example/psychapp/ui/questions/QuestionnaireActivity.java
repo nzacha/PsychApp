@@ -313,14 +313,16 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
     private static void saveAnswers() throws IOException, ClassNotFoundException {
         ArrayList<Question> answers = new ArrayList<Question>();
-        File file = context.getFileStreamPath(ANSWERS);
-        if(file.exists()) {
-            FileInputStream fis = context.openFileInput(ANSWERS);
-            ObjectInputStream is = new ObjectInputStream(fis);
+        FileInputStream fis;
+        ObjectInputStream is;
+        if(answersExist()){
+            fis = context.openFileInput(ANSWERS);
+             is = new ObjectInputStream(fis);
             answers = (ArrayList<Question>) is.readObject();
             is.close();
             fis.close();
         }
+
         //Log.d("wtf", "before: "+answers.size());
         for(Question question: questions)
             answers.add(question);
@@ -331,6 +333,12 @@ public class QuestionnaireActivity extends AppCompatActivity {
         os.close();
         fos.close();
         Log.d("wtf", "Answers saved on Phone");
+    }
+
+    public static boolean answersExist(){
+        File file = context.getFileStreamPath(ANSWERS);
+        if(file.exists()) return true;
+        return false;
     }
 
     private static void saveQuestions() throws IOException {

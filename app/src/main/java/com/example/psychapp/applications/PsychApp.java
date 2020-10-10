@@ -63,7 +63,6 @@ public class PsychApp extends Application {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         Log.d("wtf","Reminder set for "+String.format("%02d:%02d:%s", calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM"));
-
     }
 
     private void createNotificationChannel() {

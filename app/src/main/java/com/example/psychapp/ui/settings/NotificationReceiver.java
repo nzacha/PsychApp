@@ -67,7 +67,6 @@ public class NotificationReceiver extends BroadcastReceiver {
             Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             QuestionnaireActivity.setEnabled(true);
         } else {
-            PsychApp.clearNotifications();
             Log.d("wtf", "Notification suppressed");
             sendDeactivationNotification(context, intent);
         }
@@ -194,7 +193,6 @@ public class NotificationReceiver extends BroadcastReceiver {
         context.startService(serviceintent);
     }
 
-
     public void sendDeactivationNotification(Context context, Intent intent) {
         PsychApp.clearNotifications();
         QuestionnaireActivity.setEnabled(false);
@@ -231,7 +229,5 @@ public class NotificationReceiver extends BroadcastReceiver {
             //deprecated in API 26
             v.vibrate(500);
         }
-
-        PsychApp.instance.scheduleNotificationReminder(reminder_code);
     }
 }

@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        final boolean savedData = (user==null);
+        final boolean savedData = (user!=null);
         loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
             @Override
             public void onChanged(@Nullable LoginResult loginResult) {
@@ -108,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    updateUiWithUser(user, (savedData && user!=null));
+                    updateUiWithUser(user, (!savedData && user!=null));
                     setResult(Activity.RESULT_OK);
                     finish();
                 }
@@ -116,8 +116,19 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         //user exists
-        if(!savedData){
+        if(savedData){
             Log.d("wtf","code available");
+            if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(context)){
+                Log.d("wtf","sending local answers");
+                try {
+                    QuestionnaireActivity.sendLocalAnswers(user.getUserId());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
             codeEditText.setVisibility(View.GONE);
             loginButton.setVisibility(View.GONE);
             loadingProgressBar.setVisibility(View.VISIBLE);
@@ -269,7 +280,7 @@ public class LoginActivity extends AppCompatActivity {
     public static void progress(){
         //Log.d("wtf", "before progress: "+user.getProgress());
         user.progress();
-        Log.d("wtf", "progress: "+user.getProgress()+"/"+user.getMaxProgress());
+        Log.d("wtf", "progress is updating from / to: "+user.getProgress()+"/"+user.getMaxProgress());
         try {
             saveUserInfo(user);
         } catch (IOException e) {
