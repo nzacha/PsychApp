@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         //QuestionnaireActivity.setEnabled(true);
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MINUTE, 1);
+        cal.add(Calendar.SECOND, 10);
         PsychApp.instance.scheduleDailyNotification(cal,145);
     }
 }

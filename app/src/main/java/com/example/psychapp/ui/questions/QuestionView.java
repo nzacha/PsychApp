@@ -15,6 +15,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.psychapp.R;
+import com.example.psychapp.data.Question;
 
 import java.util.InputMismatchException;
 
@@ -26,7 +27,7 @@ public class QuestionView extends View{
         this.context = context;
     }
 
-    public void inflateInto(ViewGroup parent,Question question, int index){
+    public void inflateInto(ViewGroup parent, Question question, int index){
         init(parent, question, index);
     }
 

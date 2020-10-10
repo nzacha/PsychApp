@@ -1,13 +1,13 @@
-package com.example.psychapp.ui.questions;
+package com.example.psychapp.data;
 
 
 import java.io.Serializable;
 
-import static com.example.psychapp.ui.questions.Question.QuestionType.MULTIPLE_CHOICE;
-import static com.example.psychapp.ui.questions.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
-import static com.example.psychapp.ui.questions.Question.QuestionType.SLIDER;
-import static com.example.psychapp.ui.questions.Question.QuestionType.SLIDER_DISCRETE;
-import static com.example.psychapp.ui.questions.Question.QuestionType.TEXT;
+import static com.example.psychapp.data.Question.QuestionType.MULTIPLE_CHOICE;
+import static com.example.psychapp.data.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
+import static com.example.psychapp.data.Question.QuestionType.SLIDER;
+import static com.example.psychapp.data.Question.QuestionType.SLIDER_DISCRETE;
+import static com.example.psychapp.data.Question.QuestionType.TEXT;
 
 public class Question implements Serializable{
     public static final String VERTICAL = "Vertical", HORIZONTAL = "Horizontal";
@@ -20,7 +20,7 @@ public class Question implements Serializable{
         MULTIPLE_CHOICE_HORIZONTAL,
     }
 
-    public int id;
+    public int id, userId;
     public String question = "Placeholder Question";
     public String answer = "", hint = null;
     public QuestionType type = TEXT;
@@ -28,14 +28,16 @@ public class Question implements Serializable{
     public int level;
     public boolean requestReason;
 
-    public Question(int id, String question, QuestionType type){
+    public Question(int userId, int id, String question, QuestionType type){
+        this.userId = userId;
         this.id = id;
         this.question = question;
         this.type = type;
     }
 
     //constructor for multiple choice questions
-    public Question(int id, String question, String[] options, String orientation, boolean requestReason){
+    public Question(int userId, int id, String question, String[] options, String orientation, boolean requestReason){
+        this.userId = userId;
         this.id = id;
         this.question = question;
         if(orientation.equals(VERTICAL)) {
@@ -49,7 +51,8 @@ public class Question implements Serializable{
     }
 
     //constructor for slider
-    public Question(int id, String question, QuestionType type, int level){
+    public Question(int userId, int id, String question, QuestionType type, int level){
+        this.userId = userId;
         this.id = id;
         this.question = question;
         this.level = level;

@@ -61,6 +61,18 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //send local answers
+        if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(context)){
+            Log.d("wtf","sending local answers");
+            try {
+                QuestionnaireActivity.sendLocalAnswers();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         //setLocale("el");
 
         final EditText codeEditText = findViewById(R.id.code_text);
@@ -118,16 +130,6 @@ public class LoginActivity extends AppCompatActivity {
         //user exists
         if(savedData){
             Log.d("wtf","code available");
-            if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(context)){
-                Log.d("wtf","sending local answers");
-                try {
-                    QuestionnaireActivity.sendLocalAnswers(user.getUserId());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
 
             codeEditText.setVisibility(View.GONE);
             loginButton.setVisibility(View.GONE);

@@ -32,10 +32,8 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.ExitActivity;
-import com.example.psychapp.data.Exceptions;
-import com.example.psychapp.data.LoggedInUser;
-import com.example.psychapp.data.Result;
-import com.example.psychapp.ui.questions.Question.QuestionType;
+import com.example.psychapp.data.Question;
+import com.example.psychapp.data.Question.QuestionType;
 import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.login.LoginActivity;
@@ -253,15 +251,15 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 }
-                                questions.add(new Question(id, question, optionsList, orientation, requestReason));
+                                questions.add(new Question(LoginActivity.user.getUserId(), id, question, optionsList, orientation, requestReason));
                             }
                             //sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
-                                questions.add(new Question(id, question, QuestionType.SLIDER, level));
+                                questions.add(new Question(LoginActivity.user.getUserId(),id, question, QuestionType.SLIDER, level));
                             }
                             //text
                             else{
-                                questions.add(new Question(id, question, QuestionType.TEXT));
+                                questions.add(new Question(LoginActivity.user.getUserId(),id, question, QuestionType.TEXT));
                             }
                         }
 
@@ -286,7 +284,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         queue.add(getRequest);
     }
 
-    public static void sendLocalAnswers(int userId) throws IOException, ClassNotFoundException {
+    public static void sendLocalAnswers() throws IOException, ClassNotFoundException {
         File file = context.getFileStreamPath(ANSWERS);
         if(!file.exists())
             return;
@@ -300,7 +298,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             Log.d("wtf", "Answers loaded from Phone");
 
             for (Question question : answers) {
-                sendAnswerToServer(question, userId);
+                sendAnswerToServer(question, question.userId);
             }
 
             context.deleteFile(ANSWERS);

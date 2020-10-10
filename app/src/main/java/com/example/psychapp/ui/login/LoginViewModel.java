@@ -24,6 +24,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import static com.example.psychapp.applications.PsychApp.context;
+
 public class LoginViewModel extends ViewModel {
     public static LoginViewModel instance;
 
@@ -54,6 +56,7 @@ public class LoginViewModel extends ViewModel {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        //make model from data
                         try {
                             JSONObject project = response.getJSONObject("project");
                             LoggedInUser user = new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), response.getInt("projectId"), project.getInt("study_length"), project.getInt("tests_per_day"), project.getInt("tests_time_interval"), project.getBoolean("allow_individual_times"), project.getBoolean("allow_user_termination"), project.getBoolean("automatic_termination"), response.getInt("progress"), response.getString("code"), response.getBoolean("isActive"));
@@ -61,13 +64,9 @@ public class LoginViewModel extends ViewModel {
                                 res = new Result.Success(user);
                             else
                                 res = new Result.Error(new Exceptions.UserInactive());
-                            QuestionnaireActivity.sendLocalAnswers(Integer.parseInt(response.get("id").toString()));
+
                         } catch (JSONException e) {
                             res = new Result.Error(new IOException("Error with JSONObject", e));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
                         }
                         authenticateResult();
                     }
