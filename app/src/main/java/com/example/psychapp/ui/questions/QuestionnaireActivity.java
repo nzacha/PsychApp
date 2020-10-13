@@ -99,7 +99,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 if(PsychApp.isNetworkConnected(context)) {
                     for (Question question : questions) {
                         Log.d("value", "sent to server: "+question.toString());
-                        sendAnswerToServer(question, LoginActivity.user.getUserId());
+                        sendAnswerToServer(question);
                     }
                     Log.d("wtf", "answers sent to server");
                 } else {
@@ -129,11 +129,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
         populateList(quizQuestionList, questions);
     }
 
-    private static void sendAnswerToServer(final Question question, int userId){
+    private static void sendAnswerToServer(final Question question){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
-        String url = PsychApp.serverUrl + "answers/" + question.id + "/" + userId;
-        Log.d("wtf", PsychApp.serverUrl + "answers/" + question.id + "/" + userId);
+        String url = PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId;
+        Log.d("wtf", PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId);
         
         Map<String, String> params = new HashMap<>();
         String answer = question.answer;
@@ -169,7 +169,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 break;
         }
         params.put("text", ""+answer);
-        params.put("progress", ""+LoginActivity.user.getProgress());
+        params.put("progress", ""+question.index);
         final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
             new Response.Listener<JSONObject>() {
@@ -251,15 +251,15 @@ public class QuestionnaireActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 }
-                                questions.add(new Question(LoginActivity.user.getUserId(), id, question, optionsList, orientation, requestReason));
+                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), id, question, optionsList, orientation, requestReason));
                             }
                             //sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
-                                questions.add(new Question(LoginActivity.user.getUserId(),id, question, QuestionType.SLIDER, level));
+                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(),id, question, QuestionType.SLIDER, level));
                             }
                             //text
                             else{
-                                questions.add(new Question(LoginActivity.user.getUserId(),id, question, QuestionType.TEXT));
+                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), id, question, QuestionType.TEXT));
                             }
                         }
 
@@ -298,7 +298,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             Log.d("wtf", "Answers loaded from Phone");
 
             for (Question question : answers) {
-                sendAnswerToServer(question, question.userId);
+                sendAnswerToServer(question);
             }
 
             context.deleteFile(ANSWERS);

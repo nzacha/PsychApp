@@ -20,7 +20,7 @@ public class Question implements Serializable{
         MULTIPLE_CHOICE_HORIZONTAL,
     }
 
-    public int id, userId;
+    public int id, userId, index;
     public String question = "Placeholder Question";
     public String answer = "", hint = null;
     public QuestionType type = TEXT;
@@ -28,16 +28,18 @@ public class Question implements Serializable{
     public int level;
     public boolean requestReason;
 
-    public Question(int userId, int id, String question, QuestionType type){
+    public Question(int userId, int index, int id, String question, QuestionType type){
         this.userId = userId;
+        this.index = index;
         this.id = id;
         this.question = question;
         this.type = type;
     }
 
     //constructor for multiple choice questions
-    public Question(int userId, int id, String question, String[] options, String orientation, boolean requestReason){
+    public Question(int userId, int index, int id, String question, String[] options, String orientation, boolean requestReason){
         this.userId = userId;
+        this.index = index;
         this.id = id;
         this.question = question;
         if(orientation.equals(VERTICAL)) {
@@ -51,8 +53,9 @@ public class Question implements Serializable{
     }
 
     //constructor for slider
-    public Question(int userId, int id, String question, QuestionType type, int level){
+    public Question(int userId, int index, int id, String question, QuestionType type, int level){
         this.userId = userId;
+        this.index = index;
         this.id = id;
         this.question = question;
         this.level = level;

@@ -221,6 +221,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void updateUiWithUser(LoggedInUser model, boolean showConsent) {
+        Log.d("wtf", "Login was successfull");
         QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getProjectId());
 
         Bundle extras = getIntent().getExtras();

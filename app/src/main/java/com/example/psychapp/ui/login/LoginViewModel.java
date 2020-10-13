@@ -74,6 +74,11 @@ public class LoginViewModel extends ViewModel {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        if(error == null || error.networkResponse == null) {
+                            res = new Result.Error(new Exception("Unknown error"));
+                            authenticateResult();
+                            return;
+                        }
                         switch(error.networkResponse.statusCode){
                             case 400:
                                 res = new Result.Error(new Exceptions.UserInactive());

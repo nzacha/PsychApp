@@ -63,6 +63,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
 
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
+            Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
             sendNotification(context, intent);
             Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             QuestionnaireActivity.setEnabled(true);
