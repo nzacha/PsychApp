@@ -72,7 +72,8 @@ public class MainActivity extends AppCompatActivity {
             NotificationReceiver.sendUserProgressUpdate();
         }
 
-        if ((!LoginActivity.user.isActive() || !(LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true))) {
+        if ((!LoginActivity.user.isActive() || (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() > LoginActivity.user.getMaxProgress() : false))) {
+            Log.d("wtf", "user was deactivated");
             PsychApp.clearNotifications();
             QuestionnaireActivity.setEnabled(false);
             LoginActivity.user.deactivate();
