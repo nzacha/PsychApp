@@ -29,6 +29,7 @@ import com.example.psychapp.ui.settings.NotificationReceiver;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,6 +52,15 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Log.d("wtf", cal.getTime().toString());
+        // Output "Wed Sep 26 14:23:28 EST 2012"
+
+        String formatted = simpledateformat.format(cal.getTime());
+        Log.d("wtf", formatted);
+        // Output "2012-09-26"
 
         //QuestionnaireActivity.setEnabled(true);
         //test();

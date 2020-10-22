@@ -50,7 +50,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -170,6 +172,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
         }
         params.put("text", ""+answer);
         params.put("progress", ""+question.index);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        String formatted = simpledateformat.format(question.date);
+        params.put("date", formatted);
         final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
             new Response.Listener<JSONObject>() {

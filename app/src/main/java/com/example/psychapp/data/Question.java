@@ -2,6 +2,7 @@ package com.example.psychapp.data;
 
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 import static com.example.psychapp.data.Question.QuestionType.MULTIPLE_CHOICE;
 import static com.example.psychapp.data.Question.QuestionType.MULTIPLE_CHOICE_HORIZONTAL;
@@ -24,6 +25,7 @@ public class Question implements Serializable{
     public String question = "Placeholder Question";
     public String answer = "", hint = null;
     public QuestionType type = TEXT;
+    public Calendar date;
     public String[] options;
     public int level;
     public boolean requestReason;
@@ -34,6 +36,7 @@ public class Question implements Serializable{
         this.id = id;
         this.question = question;
         this.type = type;
+        this.date = Calendar.getInstance();
     }
 
     //constructor for multiple choice questions
@@ -50,6 +53,7 @@ public class Question implements Serializable{
         this.answer = "" + 0;
         this.options = options;
         this.requestReason = requestReason;
+        this.date = Calendar.getInstance();
     }
 
     //constructor for slider
@@ -64,6 +68,7 @@ public class Question implements Serializable{
         }else{
             this.type =  SLIDER_DISCRETE;
         }
+        this.date = Calendar.getInstance();
     }
 
     public String toString(){
