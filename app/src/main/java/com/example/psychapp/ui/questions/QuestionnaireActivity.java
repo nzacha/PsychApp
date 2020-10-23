@@ -135,7 +135,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId;
-        Log.d("wtf", PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId);
+        Log.d("wtf", "POST to: "+PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId);
         
         Map<String, String> params = new HashMap<>();
         String answer = question.answer;
@@ -172,9 +172,10 @@ public class QuestionnaireActivity extends AppCompatActivity {
         }
         params.put("text", ""+answer);
         params.put("progress", ""+question.index);
-        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        String formatted = simpledateformat.format(question.date);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+        String formatted = simpledateformat.format(question.date.getTime());
         params.put("date", formatted);
+        Log.d("wtf", formatted);
         final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
             new Response.Listener<JSONObject>() {
