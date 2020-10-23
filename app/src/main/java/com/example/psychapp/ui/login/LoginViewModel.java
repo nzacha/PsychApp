@@ -60,6 +60,7 @@ public class LoginViewModel extends ViewModel {
                         try {
                             JSONObject project = response.getJSONObject("project");
                             LoggedInUser user = new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), response.getInt("projectId"), project.getInt("study_length"), project.getInt("tests_per_day"), project.getInt("tests_time_interval"), project.getBoolean("allow_individual_times"), project.getBoolean("allow_user_termination"), project.getBoolean("automatic_termination"), response.getInt("progress"), response.getString("code"), response.getBoolean("isActive"));
+                            Log.d("wtf", user.toString());
                             if(user.isActive())
                                 res = new Result.Success(user);
                             else
@@ -74,6 +75,7 @@ public class LoginViewModel extends ViewModel {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Log.d("wtf", error.toString());
                         if(error == null || error.networkResponse == null) {
                             res = new Result.Error(new Exception("Unknown error"));
                             authenticateResult();

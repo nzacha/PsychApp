@@ -53,17 +53,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Log.d("wtf", cal.getTime().toString());
-        // Output "Wed Sep 26 14:23:28 EST 2012"
-
-        String formatted = simpledateformat.format(cal.getTime());
-        Log.d("wtf", formatted);
-        // Output "2012-09-26"
-
-        //QuestionnaireActivity.setEnabled(true);
-        //test();
+        QuestionnaireActivity.setEnabled(true);
+        test();
     }
 
     private void test(){

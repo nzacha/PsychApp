@@ -3,5 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">109.110.252.231</domain>
+        <domain includeSubdomains="true">psychappportal.cs.ucy.ac.cy</domain>
     </domain-config>
 </network-security-config>
