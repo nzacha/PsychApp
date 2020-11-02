@@ -101,7 +101,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 if(PsychApp.isNetworkConnected(context)) {
                     for (Question question : questions) {
                         Log.d("value", "sent to server: "+question.toString());
-                        sendAnswerToServer(question);
+                        sendAnswerToServer(question, Calendar.getInstance());
                     }
                     Log.d("wtf", "answers sent to server");
                 } else {
@@ -131,7 +131,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         populateList(quizQuestionList, questions);
     }
 
-    private static void sendAnswerToServer(final Question question){
+    private static void sendAnswerToServer(final Question question, Calendar date){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId;
@@ -173,7 +173,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         params.put("text", ""+answer);
         params.put("progress", ""+question.index);
         SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        String formatted = simpledateformat.format(question.date);
+        String formatted = simpledateformat.format(date);
         params.put("date", formatted);
         final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
@@ -303,7 +303,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             Log.d("wtf", "Answers loaded from Phone");
 
             for (Question question : answers) {
-                sendAnswerToServer(question);
+                sendAnswerToServer(question, question.date);
             }
 
             context.deleteFile(ANSWERS);
@@ -320,15 +320,17 @@ public class QuestionnaireActivity extends AppCompatActivity {
         ObjectInputStream is;
         if(answersExist()){
             fis = context.openFileInput(ANSWERS);
-             is = new ObjectInputStream(fis);
+            is = new ObjectInputStream(fis);
             answers = (ArrayList<Question>) is.readObject();
             is.close();
             fis.close();
         }
 
         //Log.d("wtf", "before: "+answers.size());
-        for(Question question: questions)
+        for(Question question: questions) {
+            question.date = Calendar.getInstance();
             answers.add(question);
+        }
         //Log.d("wtf", "after: "+answers.size());
         FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
