@@ -173,7 +173,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         params.put("text", ""+answer);
         params.put("progress", ""+question.index);
         SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        String formatted = simpledateformat.format(date);
+        String formatted = simpledateformat.format(date.getTime());
         params.put("date", formatted);
         final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
