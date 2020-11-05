@@ -1,2 +1,2 @@
 # PsychApp
-The back end for PsychApp
+The back end of PsychApp
