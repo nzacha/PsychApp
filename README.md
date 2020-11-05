@@ -1,2 +1,2 @@
 # PsychApp
-The back end of the Psychology app
+The back end for PsychApp
