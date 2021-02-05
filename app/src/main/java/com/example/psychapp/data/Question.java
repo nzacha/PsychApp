@@ -28,7 +28,7 @@ public class Question implements Serializable{
     public Calendar date;
     public String[] options;
     public int level;
-    public boolean requestReason;
+    public boolean requestReason, missing=false;
 
     public Question(int userId, int index, int id, String question, QuestionType type){
         this.userId = userId;

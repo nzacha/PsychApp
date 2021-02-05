@@ -23,6 +23,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.data.LoggedInUser;
+import com.example.psychapp.data.Question;
 import com.example.psychapp.ui.login.LogoActivity;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.ui.login.LoginActivity;
@@ -30,6 +31,8 @@ import com.example.psychapp.ui.login.LoginActivity;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,6 +67,30 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
             Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
+
+            if(QuestionnaireActivity.isActive()){
+                ArrayList<Question> questions = QuestionnaireActivity.questions;
+                Log.d("wtf", "Answers Missing");
+                if (PsychApp.isNetworkConnected(PsychApp.context)) {
+                    for(Question question: questions) {
+                        final Question _question = question;
+                        _question.missing = true;
+                        QuestionnaireActivity.sendAnswerToServer(_question, Calendar.getInstance());
+                    }
+                }else{
+                    for(Question question: questions) {
+                        question.missing = true;
+                        try {
+                            QuestionnaireActivity.saveAnswers(questions);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
             sendNotification(context, intent);
             Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             QuestionnaireActivity.setEnabled(true);

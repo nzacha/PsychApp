@@ -106,7 +106,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     Log.d("wtf", "answers sent to server");
                 } else {
                     try {
-                        saveAnswers();
+                        saveAnswers(questions);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
@@ -131,7 +131,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         populateList(quizQuestionList, questions);
     }
 
-    private static void sendAnswerToServer(final Question question, Calendar date){
+    public static void sendAnswerToServer(final Question question, Calendar date){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId;
@@ -140,35 +140,39 @@ public class QuestionnaireActivity extends AppCompatActivity {
         Map<String, String> params = new HashMap<>();
         String answer = question.answer;
 
-        switch (question.type){
-            case SLIDER:
-            case SLIDER_DISCRETE:
-                int temp;
-                try {
-                    temp = Integer.parseInt(answer);
-                } catch (NumberFormatException nfe){
-                    temp = 0;
-                }
-                if (question.type == QuestionType.SLIDER_DISCRETE)
-                    temp++;
-                answer = ""+ (temp);
-                break;
-            case MULTIPLE_CHOICE:
-            case MULTIPLE_CHOICE_HORIZONTAL:
-                int index ;
-                try {
-                    index = Integer.parseInt(answer);
-                    answer = question.options[index];
-                } catch (NumberFormatException nfe){
-                    answer = nfe.getMessage();
-                } catch (ArrayIndexOutOfBoundsException nfe){
-                    answer = question.hint;
-                }
-                break;
-            case TEXT:
-                if(answer == "")
-                    answer = "No answer given";
-                break;
+        if(question.missing){
+            answer = "No answer given";
+        }else {
+            switch (question.type) {
+                case SLIDER:
+                case SLIDER_DISCRETE:
+                    int temp;
+                    try {
+                        temp = Integer.parseInt(answer);
+                    } catch (NumberFormatException nfe) {
+                        temp = 0;
+                    }
+                    if (question.type == QuestionType.SLIDER_DISCRETE)
+                        temp++;
+                    answer = "" + (temp);
+                    break;
+                case MULTIPLE_CHOICE:
+                case MULTIPLE_CHOICE_HORIZONTAL:
+                    int index;
+                    try {
+                        index = Integer.parseInt(answer);
+                        answer = question.options[index];
+                    } catch (NumberFormatException nfe) {
+                        answer = nfe.getMessage();
+                    } catch (ArrayIndexOutOfBoundsException nfe) {
+                        answer = question.hint;
+                    }
+                    break;
+                case TEXT:
+                    if (answer == "")
+                        answer = "No answer given";
+                    break;
+            }
         }
         params.put("text", ""+answer);
         params.put("progress", ""+question.index);
@@ -314,7 +318,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         }
     }
 
-    private static void saveAnswers() throws IOException, ClassNotFoundException {
+    public static void saveAnswers(ArrayList<Question> questions) throws IOException, ClassNotFoundException {
         ArrayList<Question> answers = new ArrayList<Question>();
         FileInputStream fis;
         ObjectInputStream is;

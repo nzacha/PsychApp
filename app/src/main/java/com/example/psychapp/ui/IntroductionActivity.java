@@ -21,8 +21,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
+import com.example.psychapp.data.Question;
 import com.example.psychapp.ui.login.ConsentActivity;
 import com.example.psychapp.ui.login.LoginActivity;
+import com.example.psychapp.ui.questions.QuestionnaireActivity;
+import com.example.psychapp.ui.settings.NotificationReceiver;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
 import org.json.JSONException;
@@ -33,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 
 import static com.example.psychapp.applications.PsychApp.context;
 
