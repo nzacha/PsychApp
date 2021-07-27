@@ -112,6 +112,8 @@ public class Settings_Account_Fragment extends Fragment {
     }
 
     private void logout(){
+        context.deleteFile(QuestionnaireActivity.QUESTIONS);
+        context.deleteFile(QuestionnaireActivity.ANSWERS);
         QuestionnaireActivity.setEnabled(false);
         LoginActivity.clearInfo();
         PsychApp.clearNotifications();

@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //QuestionnaireActivity.setEnabled(true);
-        //test();
+        QuestionnaireActivity.setEnabled(true);
+        test();
     }
 
     private void test(){
@@ -62,16 +62,19 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                sendTest();
+                sendTest(false);
             }
         }, 3000);
     }
 
-    private void sendTest(){
+    private void sendTest(boolean sendNotification){
         LoginActivity.progress();
         if (PsychApp.isNetworkConnected(PsychApp.context)) {
             NotificationReceiver.sendUserProgressUpdate();
         }
+
+        if(!sendNotification)
+            return;
 
         if ((!LoginActivity.user.isActive() || (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() > LoginActivity.user.getMaxProgress() : false))) {
             Log.d("wtf", "user was deactivated");

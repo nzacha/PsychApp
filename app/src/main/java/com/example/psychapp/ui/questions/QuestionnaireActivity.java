@@ -62,7 +62,7 @@ import static com.example.psychapp.applications.PsychApp.context;
 
 public class QuestionnaireActivity extends AppCompatActivity {
     public static ArrayList<Question> questions = new ArrayList<Question>();
-    private static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions", ANSWERS = "Answers";
+    public static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions", ANSWERS = "Answers";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +99,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(PsychApp.isNetworkConnected(context)) {
+                    Log.d("wtf", "answers sent to server ("+questions.size()+")");
                     for (Question question : questions) {
                         Log.d("value", "sent to server: "+question.toString());
                         sendAnswerToServer(question, Calendar.getInstance());
                     }
-                    Log.d("wtf", "answers sent to server");
                 } else {
                     try {
                         saveAnswers(questions);
@@ -135,7 +135,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
         String url = PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId;
-        Log.d("wtf", PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId);
+        Log.d("info", url);
         
         Map<String, String> params = new HashMap<>();
         String answer = question.answer;
@@ -184,7 +184,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d("wtf", "Sent to server: "+question);
+                    Log.d("info", "Sent to server: "+question);
                 }
             },
             new Response.ErrorListener() {
@@ -264,7 +264,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                             }
                             //sliders
                             else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
-                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(),id, question, QuestionType.SLIDER, level));
+                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), id, question, QuestionType.SLIDER, level));
                             }
                             //text
                             else{
@@ -304,7 +304,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         fis.close();
 
         if(answers.size() > 0) {
-            Log.d("wtf", "Answers loaded from Phone");
+            Log.d("wtf", "Answers loaded from Phone ("+answers.size()+")");
 
             for (Question question : answers) {
                 sendAnswerToServer(question, question.date);
@@ -330,12 +330,13 @@ public class QuestionnaireActivity extends AppCompatActivity {
             fis.close();
         }
 
-        //Log.d("wtf", "before: "+answers.size());
+        Log.d("wtf", "before: "+answers.size());
         for(Question question: questions) {
             question.date = Calendar.getInstance();
+            question.index = LoginActivity.user.getProgress();
             answers.add(question);
         }
-        //Log.d("wtf", "after: "+answers.size());
+        Log.d("wtf", "after: "+answers.size());
         FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
         os.writeObject(answers);
@@ -365,7 +366,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         questions = (ArrayList<Question>) is.readObject();
         is.close();
         fis.close();
-        Log.d("wtf", "Questions loaded from Phone");
+        Log.d("wtf", "Questions loaded from Phone (" +questions.size()+")");
     }
 
     public static void clearQuestions(){
