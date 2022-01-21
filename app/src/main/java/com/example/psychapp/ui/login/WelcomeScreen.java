@@ -20,7 +20,7 @@ public class WelcomeScreen extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ExitActivity.exitApplication(getApplication());
+            ExitActivity.exitApplication(getApplication());
             }
         });
     }

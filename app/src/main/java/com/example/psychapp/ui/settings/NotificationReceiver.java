@@ -24,6 +24,7 @@ import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.data.LoggedInUser;
 import com.example.psychapp.data.Question;
+import com.example.psychapp.data.Section;
 import com.example.psychapp.ui.login.LogoActivity;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.ui.login.LoginActivity;
@@ -63,30 +64,33 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void trackProgress(Context context, Intent intent) {
         if (PsychApp.isNetworkConnected(PsychApp.context)) {
             sendUserProgressUpdate();
+            //TODO FIXME
         }
 
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
             Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
 
             if(QuestionnaireActivity.isActive()){
-                ArrayList<Question> questions = QuestionnaireActivity.questions;
+                ArrayList<Section> sections = QuestionnaireActivity.sections;
                 Log.d("wtf", "Answers Missing");
                 if (PsychApp.isNetworkConnected(PsychApp.context)) {
-                    for(Question question: questions) {
-                        final Question _question = question;
-                        _question.missing = true;
-                        QuestionnaireActivity.sendAnswerToServer(_question, Calendar.getInstance());
-                    }
-                }else{
-                    for(Question question: questions) {
-                        question.missing = true;
-                        try {
-                            QuestionnaireActivity.saveAnswers(questions);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                    for(Section section: sections)
+                        for(Question question: section.questions) {
+                            final Question _question = question;
+                            _question.missing = true;
+                            QuestionnaireActivity.sendAnswerToServer(_question, Calendar.getInstance());
                         }
+                }else{
+                    for(Section section: sections)
+                        for(Question question: section.questions) {
+                            question.missing = true;
+                    }
+                    try {
+                        QuestionnaireActivity.saveAnswers(sections);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -122,7 +126,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_stat_name)
+                .setSmallIcon(R.drawable.app_logo)
                 .setTimeoutAfter(10800000);
         /*
         if(Build.VERSION.SDK_INT < 25) {
@@ -164,7 +168,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_stat_name)
+                .setSmallIcon(R.drawable.app_logo)
                 .setTimeoutAfter(10800000);
         /*
         if(Build.VERSION.SDK_INT < 25) {
@@ -192,25 +196,33 @@ public class NotificationReceiver extends BroadcastReceiver {
     public static void sendUserProgressUpdate() {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
-        String url = PsychApp.serverUrl + "users/progress/" + LoginActivity.user.getUserId();
+        String url = PsychApp.serverUrl + "participant/" + LoginActivity.user.getUserId();
+        Log.d("wtf", url);
 
         Map<String, String> params = new HashMap<>();
         params.put("progress", "" + LoginActivity.user.getProgress());
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        //Toast.makeText(PsychApp.context, "Progress sent to server successfully", Toast.LENGTH_LONG).show();
-                        Log.d("wtf", "Updated user progress in server to " + LoginActivity.user.getProgress());
-                        Log.d("wtf", "Server responded with: " + response.toString());
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("wtf", "An Error occurred: " + error.networkResponse.statusCode + ": " + error.networkResponse.data);
-                    }
-                });
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.PATCH, url, new JSONObject(params),
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //Toast.makeText(PsychApp.context, "Progress sent to server successfully", Toast.LENGTH_LONG).show();
+                    Log.d("wtf", "Updated user progress in server to " + LoginActivity.user.getProgress());
+                    Log.d("wtf", "Server responded with: " + response.toString());
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("wtf", "An Error occurred: " + error.networkResponse.statusCode + ": " + error.networkResponse.data);
+                }
+            }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-access-token", LoginActivity.user.getToken());
+                return params;
+            }
+        };;
 
         // add it to the RequestQueue
         queue.add(postRequest);
@@ -244,7 +256,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_stat_name);
+                .setSmallIcon(R.drawable.app_logo);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(notification_code, builder.build());

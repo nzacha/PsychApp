@@ -14,7 +14,7 @@
         android:layout_marginBottom="5dp"
         android:text="title"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="32sp" />
+        android:textSize="26sp" />
 
     <RadioGroup
         android:id="@+id/choice_group"

@@ -37,6 +37,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.example.psychapp.applications.PsychApp.context;
 
@@ -123,46 +125,59 @@ public class IntroductionActivity extends AppCompatActivity {
 
     public void setDescriptionFromDB(final TextView description,final TextView name,final TextView email,final TextView phone) throws IOException {
         final RequestQueue queue = Volley.newRequestQueue(this);
-        String url = PsychApp.serverUrl + "projects/"+ LoginActivity.user.getProjectId();
+        String url = PsychApp.serverUrl + "project/"+ LoginActivity.user.getProjectId();
+        Log.i("wtf", url);
+
         // prepare the Request
         final String[] text = new String[4];
         final JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>(){
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONObject researcher = response.getJSONArray("researchers").getJSONObject(0);
-                            text[0] = response.getString("description");
-                            if(!text[0].equals("null")){
-                                description.setText(text[0]);
-                            }
-                            text[1] = researcher.getString("name");
-                            if(!text[1].equals("null")){
-                                name.setText(text[1]);
-                            }
-                            text[2] = researcher.getString("email");
-                            if(!text[2].equals("null")){
-                                email.setText(text[2]);
-                            }
-                            text[3] = researcher.getString("phone");
-                            if(!text[3].equals("null")){
-                                phone.setText(text[3]);
-                            }
-                            saveDescriptionLocally(text);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            new Response.Listener<JSONObject>(){
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONObject project = response.getJSONObject("data").getJSONObject("response");
+                        //Log.i("wtf", project.toString());
+
+                        JSONObject director = project.getJSONObject("director");
+                        //Log.i("wtf", director.toString());
+                        text[0] = project.getString("description");
+                        if(!text[0].equals("null")){
+                            description.setText(text[0]);
                         }
-                    }
-                },
-                new Response.ErrorListener(){
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("wtf", "error");
+                        text[1] = director.getString("first_name") + " " + director.getString("last_name");
+                        if(!text[1].equals("null")){
+                            name.setText(text[1]);
+                        }
+                        text[2] = director.getString("email");
+                        if(!text[2].equals("null")){
+                            email.setText(text[2]);
+                        }
+                        text[3] = director.getString("phone");
+                        if(!text[3].equals("null")){
+                            phone.setText(text[3]);
+                        }
+                        saveDescriptionLocally(text);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-        );
+            },
+            new Response.ErrorListener(){
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("wtf", "error occurred at setDescriptionFromDB()");
+                }
+            }
+        ){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-access-token", LoginActivity.user.getToken());
+                return params;
+            }
+        };
 
         // add it to the RequestQueue
         queue.add(getRequest);

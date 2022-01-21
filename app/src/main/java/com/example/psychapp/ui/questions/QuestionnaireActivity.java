@@ -2,7 +2,6 @@ package com.example.psychapp.ui.questions;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -20,7 +19,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -28,14 +26,15 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.ExitActivity;
+import com.example.psychapp.data.LoggedInUser;
 import com.example.psychapp.data.Question;
 import com.example.psychapp.data.Question.QuestionType;
 import com.example.psychapp.R;
 import com.example.psychapp.applications.PsychApp;
+import com.example.psychapp.data.Section;
 import com.example.psychapp.ui.login.LoginActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -54,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -61,7 +61,7 @@ import java.util.Map;
 import static com.example.psychapp.applications.PsychApp.context;
 
 public class QuestionnaireActivity extends AppCompatActivity {
-    public static ArrayList<Question> questions = new ArrayList<Question>();
+    public static ArrayList<Section> sections = new ArrayList<Section>();
     public static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions", ANSWERS = "Answers";
 
     @Override
@@ -99,14 +99,15 @@ public class QuestionnaireActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(PsychApp.isNetworkConnected(context)) {
-                    Log.d("wtf", "answers sent to server ("+questions.size()+")");
-                    for (Question question : questions) {
-                        Log.d("value", "sent to server: "+question.toString());
-                        sendAnswerToServer(question, Calendar.getInstance());
+                    for (Section section : sections) {
+                        for (Question question : section.questions) {
+                            Log.d("value", "sent to server: " + question.toString());
+                            sendAnswerToServer(question, Calendar.getInstance());
+                        }
                     }
                 } else {
                     try {
-                        saveAnswers(questions);
+                        saveAnswers(sections);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (ClassNotFoundException e) {
@@ -128,13 +129,13 @@ public class QuestionnaireActivity extends AppCompatActivity {
         */
 
         LinearLayout quizQuestionList = findViewById(R.id.quiz_question_layout);
-        populateList(quizQuestionList, questions);
+        populateList(quizQuestionList, sections);
     }
 
     public static void sendAnswerToServer(final Question question, Calendar date){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
-        String url = PsychApp.serverUrl + "answers/" + question.id + "/" + question.userId;
+        String url = PsychApp.serverUrl + "answer/";
         Log.d("info", url);
         
         Map<String, String> params = new HashMap<>();
@@ -144,20 +145,20 @@ public class QuestionnaireActivity extends AppCompatActivity {
             answer = "No answer given";
         }else {
             switch (question.type) {
-                case SLIDER:
-                case SLIDER_DISCRETE:
+                case Slider:
+                case Slider_Discrete:
                     int temp;
                     try {
                         temp = Integer.parseInt(answer);
                     } catch (NumberFormatException nfe) {
                         temp = 0;
                     }
-                    if (question.type == QuestionType.SLIDER_DISCRETE)
+                    if (question.type == QuestionType.Slider_Discrete)
                         temp++;
                     answer = "" + (temp);
                     break;
-                case MULTIPLE_CHOICE:
-                case MULTIPLE_CHOICE_HORIZONTAL:
+                case Multiple_Choice:
+                case Multiple_Choice_Horizontal:
                     int index;
                     try {
                         index = Integer.parseInt(answer);
@@ -168,19 +169,22 @@ public class QuestionnaireActivity extends AppCompatActivity {
                         answer = question.hint;
                     }
                     break;
-                case TEXT:
+                case Text:
                     if (answer == "")
                         answer = "No answer given";
                     break;
             }
         }
-        params.put("text", ""+answer);
-        params.put("progress", ""+question.index);
+        params.put("answer", ""+answer);
+        params.put("index", ""+question.index);
         SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         String formatted = simpledateformat.format(date.getTime());
         params.put("date", formatted);
+        params.put("question_id", ""+question.id);
+        params.put("participant_id", ""+LoginActivity.user.getUserId());
+
         final String finalAnswer = answer;
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),
             new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -192,15 +196,22 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     Log.d("wtf", "Answer: "+ finalAnswer + ", gave server response: "+error.toString());
                 }
-            });
+            }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-access-token", LoginActivity.user.getToken());
+                return params;
+            }
+        };
 
         // add it to the RequestQueue
         queue.add(postRequest);
     }
 
-    public static void retrieveQuestions(Context context, int researcherId){
+    public static void retrieveQuestions(Context context, int projectId){
         if(PsychApp.isNetworkConnected(context)){ // && !questionsExist()
-            retrieveQuestionsFromServer(context, researcherId);
+            retrieveQuestionsFromServer(context, projectId);
         } else {
             try {
                 loadQuestions();
@@ -217,80 +228,92 @@ public class QuestionnaireActivity extends AppCompatActivity {
         return file.exists();
     }
 
-    private static void retrieveQuestionsFromServer(final Context context, int researcherId){
+    private static void retrieveQuestionsFromServer(final Context context, int projectId){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
-        String url = PsychApp.serverUrl + "questions/" + researcherId;
-
+        String url = PsychApp.serverUrl + "project/quiz/" + projectId;
+        Log.i("wtf", url);
         // prepare the Request
-        JsonArrayRequest getRequest = new JsonArrayRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONArray>(){
-                    @RequiresApi(api = Build.VERSION_CODES.N)
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        questions.clear();
-                        for( int i=0; i< response.length(); i++){
-                            int id = -1;
-                            String  question = null, type = null, orientation = null;
-                            JSONArray options = null;
-                            boolean requestReason = true;
-                            int level = 1;
-                            try {
-                                JSONObject questionObj = response.getJSONObject(i);
-                                id = questionObj.getInt("id");
-                                question = questionObj.getString("question_text");
-                                type = questionObj.getString("question_type").toUpperCase();
-                                orientation = questionObj.getString("orientation");
-                                requestReason = questionObj.getBoolean("request_reason");
-                                if(questionObj.has("question_options"))
-                                    options = questionObj.getJSONArray("question_options");
-                                if(questionObj.has("levels"))
-                                    level = Integer.parseInt(questionObj.get("levels").toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url,  null,
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //make model from data
+                    try {
+                        sections.clear();
+                        JSONObject data = response.getJSONObject("data").getJSONObject("response");
+                        Log.d("wtf", data.toString());
 
-                            //multiple choice
-                            if(options != null && options.length() > 1) {
-                                String[] optionsList = new String[options.length()];
-                                for(int j = 0; j < options.length(); j++){
-                                    try {
-                                        optionsList[j] = options.getJSONObject(j).get("option").toString();
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                        JSONArray quizSections = data.getJSONArray("quiz_sections");
+                        for(int qs=0; qs<quizSections.length(); qs++) {
+                            JSONObject quizSection = quizSections.getJSONObject(qs);
+                            int qs_id = quizSection.getInt("section_id");
+                            //Log.d("wtf", "section: "+qs_id);
+                            String qs_name = quizSection.getString("name");
+                            String qs_description = quizSection.getString("description");
+                            JSONArray quizQuestions = quizSection.getJSONArray("quiz_questions");
+
+                            Section _section = new Section(qs_name, qs_description);
+                            for (int qq = 0; qq < quizQuestions.length(); qq++) {
+                                JSONObject question = quizQuestions.getJSONObject(qq);
+                                int q_id = question.getInt("question_id");
+                                //Log.d("wtf", "question: "+q_id);
+                                String q_question = question.getString("question");
+                                String q_type = question.getString("type");
+                                String q_alignment = question.getString("alignment");
+                                boolean q_request_reason = question.getBoolean("request_reason");
+                                JSONArray question_options = question.getJSONArray("question_options");
+                                String[] q_options = new String[question_options.length()];
+                                int q_levels = q_options.length;
+                                for (int qo = 0; qo < question_options.length(); qo++){
+                                    JSONObject question_option = question_options.getJSONObject(qo);
+                                    int go_id = question_option.getInt("question_option_id");
+                                    //Log.d("wtf", "option: "+go_id);
+                                    q_options[qo] = question_option.getString("option");
                                 }
-                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), id, question, optionsList, orientation, requestReason));
-                            }
-                            //sliders
-                            else if (type.equals(QuestionType.SLIDER.name()) || type.equals(QuestionType.SLIDER_DISCRETE.name())){
-                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), id, question, QuestionType.SLIDER, level));
-                            }
-                            //text
-                            else{
-                                questions.add(new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), id, question, QuestionType.TEXT));
-                            }
-                        }
 
-                        Collections.sort(questions, new QuestionsComparator());
+                                Question _question;
+                                if(q_type.equals(QuestionType.Text.name())) {
+                                    if (q_options.length > 0) {
+                                        _question = new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), q_id, q_question, q_options, q_alignment, q_request_reason);
+                                    } else {
+                                        _question = new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), q_id, q_question, QuestionType.Text);
+                                    }
+                                }else{
+                                    _question = new Question(LoginActivity.user.getUserId(), LoginActivity.user.getProgress(), q_id, q_question, QuestionType.Slider, q_options);
+                                }
+                                _section.add(_question);
+                            }
+                            sections.add(_section);
+                        }
 
                         try {
                             saveQuestions();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }
-                },
-                new Response.ErrorListener(){
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+
+                        Log.d("wtf","Retrieved questions from server");
+                    } catch (JSONException e) {
+                        Log.e("wtf", e.getMessage());
                     }
                 }
-        );
-
-        Log.d("wtf","Retrieved questions from server");
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("wtf", error.getMessage() != null ? error.getMessage() : error.toString());
+                }
+            }){
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("x-access-token", LoginActivity.user.getToken());
+                    return params;
+                }
+            };
         // add it to the RequestQueue
-        queue.add(getRequest);
+        queue.add(request);
     }
 
     public static void sendLocalAnswers() throws IOException, ClassNotFoundException {
@@ -318,11 +341,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
         }
     }
 
-    public static void saveAnswers(ArrayList<Question> questions) throws IOException, ClassNotFoundException {
+    public static void saveAnswers(ArrayList<Section> sections) throws IOException, ClassNotFoundException {
         ArrayList<Question> answers = new ArrayList<Question>();
         FileInputStream fis;
         ObjectInputStream is;
-        if(answersExist()){
+        if (answersExist()) {
             fis = context.openFileInput(ANSWERS);
             is = new ObjectInputStream(fis);
             answers = (ArrayList<Question>) is.readObject();
@@ -330,11 +353,13 @@ public class QuestionnaireActivity extends AppCompatActivity {
             fis.close();
         }
 
-        Log.d("wtf", "before: "+answers.size());
-        for(Question question: questions) {
-            question.date = Calendar.getInstance();
-            question.index = LoginActivity.user.getProgress();
-            answers.add(question);
+        Log.d("wtf", "before: " + answers.size());
+        for (Section section : sections){
+            for (Question question : section.questions) {
+                question.date = Calendar.getInstance();
+                question.index = LoginActivity.user.getProgress();
+                answers.add(question);
+            }
         }
         Log.d("wtf", "after: "+answers.size());
         FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_PRIVATE);
@@ -354,7 +379,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     private static void saveQuestions() throws IOException {
         FileOutputStream fos = context.openFileOutput(QUESTIONS, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
-        os.writeObject(questions);
+        os.writeObject(sections);
         os.close();
         fos.close();
         Log.d("wtf", "Questions saved on Phone");
@@ -363,16 +388,18 @@ public class QuestionnaireActivity extends AppCompatActivity {
     private static void loadQuestions() throws IOException, ClassNotFoundException {
         FileInputStream fis = context.openFileInput(QUESTIONS);
         ObjectInputStream is = new ObjectInputStream(fis);
-        questions = (ArrayList<Question>) is.readObject();
+        sections = (ArrayList<Section>) is.readObject();
         is.close();
         fis.close();
-        Log.d("wtf", "Questions loaded from Phone (" +questions.size()+")");
+        Log.d("wtf", "Sections loaded from Phone (" +sections.size()+")");
     }
 
     public static void clearQuestions(){
-        for(Question question: questions){
-            question.answer = "";
-            question.hint ="";
+        for(Section section: sections){
+            for(Question question: section.questions) {
+                question.answer = "";
+                question.hint = "";
+            }
         }
 
         SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
@@ -394,11 +421,18 @@ public class QuestionnaireActivity extends AppCompatActivity {
         return sharedPreferences.getBoolean("status", false);
     }
 
-    private void populateList(LinearLayout layout, ArrayList<Question> questions){
-        int index = 0;
-        for(Question question: questions){
-            QuestionView questionView = new QuestionView(PsychApp.context);
-            questionView.inflateInto(layout, question, index++);
+    private void populateList(LinearLayout layout, ArrayList<Section> sections){
+        int s_index = 0;
+        int q_index = 0;
+        int t_index = 0;
+        for(Section section: sections) {
+            SectionView sectionView = new SectionView(PsychApp.context);
+            sectionView.inflateInto(layout, section, s_index,  t_index++);
+            for (Question question : section.questions) {
+                QuestionView questionView = new QuestionView(PsychApp.context);
+                questionView.inflateInto(layout, question, s_index, q_index++, t_index++);
+            }
+            s_index++;
         }
     }
 
@@ -414,7 +448,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             final Question question = getItem(position);
 
             switch(question.type) {
-                case TEXT:
+                case Text:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question, parent, false);
 
                     EditText answer = (EditText) convertView.findViewById(R.id.quiz_question_message);
@@ -434,7 +468,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     });
                     answer.setText(question.answer);
                     break;
-                case SLIDER:
+                case Slider:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider, parent, false);
 
                     SeekBar bar = (SeekBar) convertView.findViewById(R.id.question_seekbar);
@@ -461,7 +495,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     bar.setProgress(progress);
 
                     break;
-                case SLIDER_DISCRETE:
+                case Slider_Discrete:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
 
                     SeekBar bar2 = (SeekBar) convertView.findViewById(R.id.question_seekbar);
@@ -487,18 +521,18 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     }
                     bar2.setProgress(progress2);
                     break;
-                case MULTIPLE_CHOICE:
-                case MULTIPLE_CHOICE_HORIZONTAL:
+                case Multiple_Choice:
+                case Multiple_Choice_Horizontal:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
 
                     RadioGroup radioGroup = (RadioGroup) convertView.findViewById(R.id.choice_group);
-                    if(question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL)
+                    if(question.type == QuestionType.Multiple_Choice_Horizontal)
                         radioGroup.setOrientation(LinearLayout.HORIZONTAL);
 
                     for(String option: question.options) {
                         RadioButton button = new RadioButton(context);
                         button.setText(option);
-                        if(question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL) {
+                        if(question.type == QuestionType.Multiple_Choice_Horizontal) {
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
                             button.setLayoutParams(params);
                         }
@@ -508,7 +542,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     if(question.requestReason) {
                         RadioButton button = new RadioButton(context);
                         button.setText(getString(R.string.request_other));
-                        if (question.type == QuestionType.MULTIPLE_CHOICE_HORIZONTAL) {
+                        if (question.type == QuestionType.Multiple_Choice_Horizontal) {
                             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
                             button.setLayoutParams(params);
                         }

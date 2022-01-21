@@ -14,18 +14,20 @@
         android:layout_marginBottom="5dp"
         android:text="title"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="32sp" />
+        android:textSize="26sp" />
 
     <EditText
         android:id="@+id/quiz_question_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp"
         android:hint="Type your answer here"
         android:maxLength="100"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="24sp" />
+        android:textSize="20sp" />
 
 </LinearLayout>

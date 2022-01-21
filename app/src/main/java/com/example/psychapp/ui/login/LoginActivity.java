@@ -79,15 +79,15 @@ public class LoginActivity extends AppCompatActivity {
         final Button loginButton = findViewById(R.id.login);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
-        try {
-            loadUserInfo();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            loadUserInfo();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
-        final boolean savedData = (user!=null);
+        final boolean savedData = (user != null);
         loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
             @Override
             public void onChanged(@Nullable LoginResult loginResult) {
@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                     //value is correct occurred
                     if(user!=null) {
                         LoggedInUser newData = loginResult.getSuccess();
-                        user = new LoggedInUser(user.getUserId(), user.getDisplayName(), newData.getProjectId(), newData.getStudyLength(), newData.getTestsPerDay(), newData.getTestsTimeInterval(), newData.getAllowIndividualTimes(), newData.getAllowUserTermination(), newData.getAutomaticTermination(), user.getProgress(), user.getCode(), newData.isActive());
+                        user = new LoggedInUser(user.getUserId(), user.getDisplayName(), newData.getProjectId(), newData.getStudyLength(), newData.getTestsPerDay(), newData.getTestsTimeInterval(), newData.getAllowIndividualTimes(), newData.getAllowUserTermination(), newData.getAutomaticTermination(), user.getProgress(), user.getCode(), newData.isActive(), user.getToken());
                     } else {
                         user = loginResult.getSuccess();
                     }
@@ -120,7 +120,7 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    updateUiWithUser(user, (!savedData && user!=null));
+                    updateUiWithUser(user, (!savedData && user != null));
                     setResult(Activity.RESULT_OK);
                     finish();
                 }
@@ -136,10 +136,13 @@ public class LoginActivity extends AppCompatActivity {
             loadingProgressBar.setVisibility(View.VISIBLE);
 
             if(PsychApp.isNetworkConnected(this)){
+                Log.d("wtf", "fetching user data from server");
                 NotificationReceiver.sendUserProgressUpdate();
+                //TODO FIXME
                 loginViewModel.setCode(""+user.getCode());
                 LoginBackgroundTask loginTask = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
             } else {
+                Log.d("wtf", "fetching user data from local storage");
                 try {
                     loadUserInfo();
                 } catch (IOException e) {
@@ -148,9 +151,9 @@ public class LoginActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                updateUiWithUser(user, false);
-                setResult(Activity.RESULT_OK);
-                finish();
+//                updateUiWithUser(user, false);
+//                setResult(Activity.RESULT_OK);
+//                finish();
             }
             return;
         }
@@ -308,7 +311,6 @@ public class LoginActivity extends AppCompatActivity {
         FileInputStream fis = context.openFileInput(USER_INFO);
         ObjectInputStream is = new ObjectInputStream(fis);
         user = (LoggedInUser) is.readObject();
-        Log.d("wtf", user.toString());
         is.close();
         fis.close();
         Log.d("wtf", "User info loaded from Phone");

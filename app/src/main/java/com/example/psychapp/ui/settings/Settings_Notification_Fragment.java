@@ -23,7 +23,6 @@ import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.login.LoginActivity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -77,9 +76,14 @@ public class Settings_Notification_Fragment extends Fragment {
             }
         });
 
+        Log.d("wtf", ""+LoginActivity.user.getTestsPerDay());
         if (LoginActivity.user.getTestsPerDay() > 1  && LoginActivity.user.getAllowIndividualTimes()) {
+            notificationLabel.setText(R.string.notification_time_interval);
+            String modifiedReminderText = notificationLabel.getText().toString();
+            modifiedReminderText.replace("${1}", ""+LoginActivity.user.getTestsPerDay()).replace("${2}", ""+LoginActivity.user.getTestsTimeInterval());
+            notificationLabel.setText(modifiedReminderText);
+
             notificationTime.setVisibility(View.INVISIBLE);
-            notificationLabel.setText(R.string.notification_time_title);
 
             RadioButton radio;
             for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){

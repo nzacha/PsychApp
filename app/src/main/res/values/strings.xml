@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">I_CAN_ACT</string>
+    <string name="app_name" translatable="false">Accept Me</string>
     <string name="channel_name" translatable="false">PsychApp_Reminder</string>
     <string name="channel_description" translatable="false">PsychApp notification reminder</string>
     <string name="tab_account">Λογαριασμός</string>
@@ -27,7 +27,7 @@
     <string name="settings_button">Ρυθμίσεις ⚙</string>
     <string name="introduction_button">Περιγραφή έρευνας 📋</string>
     <string name="notification_time">Ποιά ώρα είναι βολική για εσένα, για να απαντήσεις στις ερωτήσεις, για πρώτη φορά στην ημέρα σου (κατα προτίμηση μόλις ξυπνήσεις);</string>
-    <string name="notification_time_title">"Ποιες ώρες είναι βολικές για εσένα για να απαντήσεις στις σύντομες ερωτήσεις; "</string>
+    <string name="notification_time_interval">Το ερωτηματολόγιο πρέπει να το απαντάτε ${1} φορές τη μέρα, καθε ${2} ώρες. Θα λαμβάνετε ειδοποίηση στις ώρες αυτές και μια υπενθύμιση 30 λεπτά μετά.</string>
     <string name="save_button">Αποθήκευση</string>
     <string name="settings">Ρυθμίσεις</string>
     <string name="logout">Έξοδος</string>

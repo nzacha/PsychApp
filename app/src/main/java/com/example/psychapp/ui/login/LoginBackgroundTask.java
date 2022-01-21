@@ -8,12 +8,6 @@ public class LoginBackgroundTask extends AsyncTask<LoginViewModel, Integer, Long
 
     @Override
     protected Long doInBackground(LoginViewModel... loginViewModels) {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         for(LoginViewModel loginViewModel : loginViewModels){
             loginViewModel.login();
         }

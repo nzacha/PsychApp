@@ -23,6 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.example.psychapp.applications.PsychApp.context;
 
@@ -50,54 +52,61 @@ public class LoginViewModel extends ViewModel {
     public void login() {
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
-        String url = PsychApp.serverUrl + "users/" + code;
+        String url = PsychApp.serverUrl + "auth/participate";
+        Log.i("wtf", url);
 
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        //make model from data
-                        try {
-                            JSONObject project = response.getJSONObject("project");
-                            LoggedInUser user = new LoggedInUser(Integer.parseInt(response.get("id").toString()), response.get("name").toString(), response.getInt("projectId"), project.getInt("study_length"), project.getInt("tests_per_day"), project.getInt("tests_time_interval"), project.getBoolean("allow_individual_times"), project.getBoolean("allow_user_termination"), project.getBoolean("automatic_termination"), response.getInt("progress"), response.getString("code"), response.getBoolean("isActive"));
-                            Log.d("wtf", user.toString());
-                            if(user.isActive())
-                                res = new Result.Success(user);
-                            else
-                                res = new Result.Error(new Exceptions.UserInactive());
-
-                        } catch (JSONException e) {
-                            res = new Result.Error(new IOException("Error with JSONObject", e));
+        Map<String, String> body = new HashMap<>();
+        body.put("code", code);
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url,  new JSONObject(body),
+            new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    //make model from data
+                    try {
+                        JSONObject data = response.getJSONObject("data").getJSONObject("response");
+                        //Log.d("wtf", data.toString());
+                        JSONObject project = data.getJSONObject("project");
+                        //Log.d("wtf", project.toString());
+                        LoggedInUser user = new LoggedInUser(data.getInt("participant_id"), data.getString("name"), data.getInt("project_id"), project.getInt("study_length"), project.getInt("tests_per_day"), project.getInt("tests_time_interval"), project.getBoolean("allow_individual_times"), project.getBoolean("allow_user_termination"), project.getBoolean("automatic_termination"), data.getInt("progress"), data.getString("authentication_code"), data.getBoolean("is_active"), data.getString("token"));
+                        if(user.isActive()) {
+                            res = new Result.Success(user);
+                        } else {
+                            res = new Result.Error(new Exceptions.UserInactive());
                         }
-                        authenticateResult();
+                    } catch (JSONException e) {
+                        res = new Result.Error(new IOException("Error with JSONObject", e));
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("wtf", error.toString());
-                        if(error == null || error.networkResponse == null) {
-                            res = new Result.Error(new Exception("Unknown error"));
-                            authenticateResult();
-                            return;
-                        }
-                        switch(error.networkResponse.statusCode){
-                            case 400:
-                                res = new Result.Error(new Exceptions.UserInactive());
-                                break;
-                            case 404:
-                                res = new Result.Error(new Exceptions.InvalidCredentials());
-                                break;
-                            default:
-                                Log.d("wtf",error.networkResponse.statusCode+": "+error.networkResponse.data);
-                                res = new Result.Error(new Exception());
-                        }
+                    authenticateResult();
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("wtf", error.getStackTrace()[0].toString());
+                    error.printStackTrace();
+                    if(error == null || error.networkResponse == null) {
+                        res = new Result.Error(new Exception("Unknown error"));
                         authenticateResult();
+                        return;
                     }
-                });
+                    switch(error.networkResponse.statusCode){
+                        case 400:
+                            res = new Result.Error(new Exceptions.UserInactive());
+                            break;
+                        case 404:
+                            res = new Result.Error(new Exceptions.InvalidCredentials());
+                            break;
+                        default:
+                            Log.d("wtf",error.networkResponse.statusCode+": "+error.networkResponse.data);
+                            res = new Result.Error(new Exception());
+                    }
+                    authenticateResult();
+                }
+            }){
+        };
 
         // add it to the RequestQueue
-        queue.add(postRequest);
+        queue.add(request);
     }
 
     public void authenticateResult(){
