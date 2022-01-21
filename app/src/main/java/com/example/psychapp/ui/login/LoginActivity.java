@@ -138,7 +138,6 @@ public class LoginActivity extends AppCompatActivity {
             if(PsychApp.isNetworkConnected(this)){
                 Log.d("wtf", "fetching user data from server");
                 NotificationReceiver.sendUserProgressUpdate();
-                //TODO FIXME
                 loginViewModel.setCode(""+user.getCode());
                 LoginBackgroundTask loginTask = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
             } else {

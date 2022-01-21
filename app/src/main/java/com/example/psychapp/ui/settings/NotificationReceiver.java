@@ -64,7 +64,6 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void trackProgress(Context context, Intent intent) {
         if (PsychApp.isNetworkConnected(PsychApp.context)) {
             sendUserProgressUpdate();
-            //TODO FIXME
         }
 
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
