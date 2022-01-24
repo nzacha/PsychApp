@@ -181,7 +181,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         String formatted = simpledateformat.format(date.getTime());
         params.put("date", formatted);
         params.put("question_id", ""+question.id);
-        params.put("participant_id", ""+LoginActivity.user.getUserId());
+        params.put("participant_id", ""+question.userId);
 
         final String finalAnswer = answer;
         JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.PUT, url, new JSONObject(params),

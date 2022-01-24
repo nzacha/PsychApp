@@ -57,74 +57,74 @@ public class MainActivity extends AppCompatActivity {
 //        test();
     }
 
-//    private void test(){
-//        final Handler handler = new Handler(Looper.getMainLooper());
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                sendTest(true);
-//            }
-//        }, 3000);
-//    }
-//
-//    private void sendTest(boolean sendNotification){
-//        LoginActivity.progress();
-//        if (PsychApp.isNetworkConnected(PsychApp.context)) {
-//            NotificationReceiver.sendUserProgressUpdate();
-//        }
-//
-//        if(!sendNotification)
-//            return;
-//
-//        if ((!LoginActivity.user.isActive() || (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() > LoginActivity.user.getMaxProgress() : false))) {
-//            Log.d("wtf", "user was deactivated");
-//            PsychApp.clearNotifications();
-//            QuestionnaireActivity.setEnabled(false);
-//            LoginActivity.user.deactivate();
-//            LoginActivity.clearInfo();
-//            PsychApp.cancelAlarmNotifications();
-//            finishAffinity();
-//            return;
-//        }
-//        Context context = PsychApp.context;
-//        PsychApp.clearNotifications();
-//        Log.d("wtf", "Sending Notification");
-//
-//        Intent newIntent = new Intent(context, LoginActivity.class);
-//        newIntent.putExtra("notification_origin", true);
-//        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-//        stackBuilder.addNextIntentWithParentStack(newIntent);
-//        PendingIntent pendingIntent = stackBuilder.getPendingIntent(13452, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        NotificationCompat.Builder builder;
-//        builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)
-//                .setContentTitle(context.getString(R.string.app_name))
-//                .setContentText(context.getString(R.string.notification_title))
-//                .setContentIntent(pendingIntent)
-//                //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
-//                .setPriority(NotificationCompat.PRIORITY_HIGH)
-//                .setAutoCancel(true)
-//                .setSmallIcon(R.drawable.ic_stat_name)
-//                .setTimeoutAfter(10800000);
-//        /*
-//        if(Build.VERSION.SDK_INT < 25) {
-//            builder.setSmallIcon(R.drawable.ic_stat_name);
-//        }else{
-//            builder.setSmallIcon(R.drawable.ic_launcher);
-//        }
-//        */
-//
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-//        notificationManager.notify(1345, builder.build());
-//
-//        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-//        // Vibrate for 500 milliseconds
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-//        } else {
-//            //deprecated in API 26
-//            v.vibrate(500);
-//        }
-//    }
+    private void test(){
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sendTest(true);
+            }
+        }, 3000);
+    }
+
+    private void sendTest(boolean sendNotification){
+        LoginActivity.progress();
+        if (PsychApp.isNetworkConnected(PsychApp.context)) {
+            NotificationReceiver.sendUserProgressUpdate();
+        }
+
+        if(!sendNotification)
+            return;
+
+        if ((!LoginActivity.user.isActive() || (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() > LoginActivity.user.getMaxProgress() : false))) {
+            Log.d("wtf", "user was deactivated");
+            PsychApp.clearNotifications();
+            QuestionnaireActivity.setEnabled(false);
+            LoginActivity.user.deactivate();
+            LoginActivity.clearInfo();
+            PsychApp.cancelAlarmNotifications();
+            finishAffinity();
+            return;
+        }
+        Context context = PsychApp.context;
+        PsychApp.clearNotifications();
+        Log.d("wtf", "Sending Notification");
+
+        Intent newIntent = new Intent(context, LoginActivity.class);
+        newIntent.putExtra("notification_origin", true);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addNextIntentWithParentStack(newIntent);
+        PendingIntent pendingIntent = stackBuilder.getPendingIntent(13452, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder;
+        builder = new NotificationCompat.Builder(context, PsychApp.CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setContentText(context.getString(R.string.notification_title))
+                .setContentIntent(pendingIntent)
+                //.setStyle(new NotificationCompat.BigTextStyle().bigText("Much longer text that cannot fit one line..."))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.app_logo)
+                .setTimeoutAfter(10800000);
+        /*
+        if(Build.VERSION.SDK_INT < 25) {
+            builder.setSmallIcon(R.drawable.ic_stat_name);
+        }else{
+            builder.setSmallIcon(R.drawable.ic_launcher);
+        }
+        */
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(1345, builder.build());
+
+        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            v.vibrate(500);
+        }
+    }
 }

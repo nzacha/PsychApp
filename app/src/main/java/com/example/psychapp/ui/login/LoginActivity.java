@@ -73,21 +73,21 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
+        try {
+            loadUserInfo();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        final boolean savedData = (user != null);
+
         //setLocale("el");
 
         final EditText codeEditText = findViewById(R.id.code_text);
         final Button loginButton = findViewById(R.id.login);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
-//        try {
-//            loadUserInfo();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-
-        final boolean savedData = (user != null);
         loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
             @Override
             public void onChanged(@Nullable LoginResult loginResult) {
@@ -141,18 +141,18 @@ public class LoginActivity extends AppCompatActivity {
                 loginViewModel.setCode(""+user.getCode());
                 LoginBackgroundTask loginTask = (LoginBackgroundTask) new LoginBackgroundTask().execute(loginViewModel);
             } else {
-                Log.d("wtf", "fetching user data from local storage");
-                try {
-                    loadUserInfo();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+//                Log.d("wtf", "fetching user data from local storage");
+//                try {
+//                    loadUserInfo();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (ClassNotFoundException e) {
+//                    e.printStackTrace();
+//                }
 
-//                updateUiWithUser(user, false);
-//                setResult(Activity.RESULT_OK);
-//                finish();
+                updateUiWithUser(user, false);
+                setResult(Activity.RESULT_OK);
+                finish();
             }
             return;
         }
