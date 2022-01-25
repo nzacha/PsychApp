@@ -16,4 +16,12 @@ public class Section implements Serializable {
     public void add(Question question){
         questions.add(question);
     }
+
+    public String toString(){
+        String s = name + ", " + description + ", ";
+        for(Question q: questions){
+            s+= q.toString() + ",";
+        }
+        return  s;
+    }
 }

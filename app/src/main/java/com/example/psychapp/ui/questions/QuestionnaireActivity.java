@@ -129,6 +129,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
         */
 
         LinearLayout quizQuestionList = findViewById(R.id.quiz_question_layout);
+//        for(Section s: sections){
+//            Log.d("wtf", s.toString());
+//        }
         populateList(quizQuestionList, sections);
     }
 
@@ -332,7 +335,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
             for (Question question : answers) {
                 sendAnswerToServer(question, question.date);
             }
-
             context.deleteFile(ANSWERS);
 
             Log.d("wtf", "Local answers sent to server");

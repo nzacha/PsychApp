@@ -51,7 +51,7 @@ public class QuestionView extends View{
                     }
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        QuestionnaireActivity.sections.get(s_index).questions.get(q_index).answer = editable.toString();
+                        question.answer = editable.toString();
                         //Log.d("value", "text value changed to "+ question.answer);
                     }
                 });
@@ -65,7 +65,7 @@ public class QuestionView extends View{
                 bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                        QuestionnaireActivity.sections.get(s_index).questions.get(q_index).answer = ""+i;
+                        question.answer = ""+i;
                         marker.setText(i+"%");
                         //Log.d("value", "slider value changed to "+ question.answer);
                     }
@@ -81,10 +81,10 @@ public class QuestionView extends View{
                 inflatedViewRoot = (ViewGroup) parent.inflate(context, R.layout.quiz_question_slider_discrete, parent);
                 inflatedView = inflatedViewRoot.getChildAt(t_index);
 
-                String[] options = QuestionnaireActivity.sections.get(s_index).questions.get(q_index).options;
+                String[] options = question.options;
                 final LinearLayout optionLabels = (LinearLayout) inflatedView.findViewById(R.id.options);
                 optionLabels.setWeightSum(options.length);
-                for(int i=options.length-1; i>=0; i--){
+                for(int i=0; i<options.length; i++){
                     TextView view = new TextView(context);
                     view.setText(options[i]);
                     view.setLayoutParams(new LinearLayout.LayoutParams(
@@ -99,14 +99,15 @@ public class QuestionView extends View{
                 SeekBar bar_discrete = (SeekBar) inflatedView.findViewById(R.id.question_seekbar_discrete);
                 if(options.length > 2) {
                     TextView left = (TextView) inflatedView.findViewById(R.id.slider_left);
-                    left.setText(options[options.length -1]);
+                    left.setText(options[0]);
                     TextView right = (TextView) inflatedView.findViewById(R.id.slider_right);
-                    right.setText(options[0]);
+                    right.setText(options[options.length -1]);
+
                 }
                 bar_discrete.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                        QuestionnaireActivity.sections.get(s_index).questions.get(q_index).answer = ""+i;
+                        question.answer = ""+i;
                         for(int j=0; j<optionLabels.getChildCount(); j++){
                             View view = optionLabels.getChildAt(j);
                             if(i!=j) view.setVisibility(INVISIBLE);
@@ -166,7 +167,7 @@ public class QuestionView extends View{
                         }
                         @Override
                         public void afterTextChanged(Editable editable) {
-                            QuestionnaireActivity.sections.get(s_index).questions.get(q_index).hint = editable.toString();
+                            question.hint = editable.toString();
                             //Log.d("value", "hint value changed to "+ question.hint);
                         }
                     });
@@ -176,7 +177,7 @@ public class QuestionView extends View{
                     @Override
                     public void onCheckedChanged(RadioGroup radioGroup, int i) {
                         int radioIndex = radioGroup.indexOfChild(radioGroup.findViewById(i));
-                        QuestionnaireActivity.sections.get(s_index).questions.get(q_index).answer = ""+radioIndex;
+                        question.answer = ""+radioIndex;
                         //Log.d("value", "choice value changed to "+ question.answer);
                         if (question.requestReason && radioIndex == radioGroup.getChildCount()-1){
                             reasoning.setVisibility(View.VISIBLE);
