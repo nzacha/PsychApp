@@ -66,8 +66,8 @@ public class NotificationReceiver extends BroadcastReceiver {
             sendUserProgressUpdate();
         }
 
+        Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
-            Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
 
             if(QuestionnaireActivity.isActive()){
                 ArrayList<Section> sections = QuestionnaireActivity.sections;
@@ -180,14 +180,14 @@ public class NotificationReceiver extends BroadcastReceiver {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(notification_code, builder.build());
 
-        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        // Vibrate for 500 milliseconds
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-        } else {
-            //deprecated in API 26
-            v.vibrate(500);
-        }
+//        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+//        // Vibrate for 500 milliseconds
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            v.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+//        } else {
+//            //deprecated in API 26
+//            v.vibrate(500);
+//        }
 
         PsychApp.instance.scheduleNotificationReminder(reminder_code);
     }
