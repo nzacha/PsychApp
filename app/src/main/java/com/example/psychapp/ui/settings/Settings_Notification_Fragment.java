@@ -141,17 +141,31 @@ public class Settings_Notification_Fragment extends Fragment {
                 public void onClick(View view) {
                     hours.clear();
                     minutes.clear();
-                    for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){
+
+                    for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++) {
                         RadioButton radio = (RadioButton) notificationTimes.getChildAt(i);
                         hours.add(Integer.parseInt(radio.getText().toString().split(":")[0]));
                         minutes.add(Integer.parseInt(radio.getText().toString().split(":")[1]));
+                    }
 
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(System.currentTimeMillis());
-                        calendar.set(Calendar.HOUR_OF_DAY, hours.get(i));
-                        calendar.set(Calendar.MINUTE, minutes.get(i));
+                    int d=0;
+                    int total = 0;
+                    while(total < LoginActivity.user.getMaxProgress()){
+                        for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++) {
+                            if(total < LoginActivity.user.getMaxProgress()) {
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTimeInMillis(System.currentTimeMillis());
+                                calendar.set(Calendar.HOUR_OF_DAY, hours.get(i));
+                                calendar.set(Calendar.MINUTE, minutes.get(i));
+                                calendar.add(Calendar.DATE, d);
 
-                        PsychApp.instance.scheduleDailyNotification(calendar, 2612 + i);
+                                if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+                                    PsychApp.instance.scheduleNotificationAt(calendar.getTimeInMillis(), 2612 + total);
+                                    total++;
+                                }
+                            }
+                        }
+                        d++;
                     }
                     getActivity().finish();
                 }
@@ -178,24 +192,23 @@ public class Settings_Notification_Fragment extends Fragment {
                     hours.add(datePicker.getHour());
                     minutes.add(datePicker.getMinute());
 
-                    if (LoginActivity.user.getTestsPerDay() == 1) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(System.currentTimeMillis());
-                        calendar.set(Calendar.HOUR_OF_DAY, hours.get(0));
-                        calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
+                    int d=0;
+                    int total = 0;
+                    while(total < LoginActivity.user.getMaxProgress()){
+                        for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++) {
+                            if (total < LoginActivity.user.getMaxProgress()) {
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTimeInMillis(System.currentTimeMillis());
+                                calendar.set(Calendar.HOUR_OF_DAY, hours.get(0) + LoginActivity.user.getTestsTimeInterval() * i);
+                                calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
+                                calendar.add(Calendar.DATE, d);
 
-                        PsychApp.instance.scheduleDailyNotification(calendar, 2612);
-                    } else {
-                        for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++){
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.setTimeInMillis(System.currentTimeMillis());
-                            calendar.set(Calendar.HOUR_OF_DAY, hours.get(0) + LoginActivity.user.getTestsTimeInterval()*i);
-                            calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
-
-                            PsychApp.instance.scheduleDailyNotification(calendar, 2612+i);
+                                PsychApp.instance.scheduleNotificationAt(calendar.getTimeInMillis(), 2612 + total);
+                                total++;
+                            }
                         }
+                        d++;
                     }
-
                     storeValues();
 
                     getActivity().finish();

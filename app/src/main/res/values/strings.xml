@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">E4Pain</string>
+    <string name="app_name" translatable="false">I_Can_Act</string>
     <string name="channel_name" translatable="false">PsychApp_Reminder</string>
     <string name="channel_description" translatable="false">PsychApp notification reminder</string>
     <string name="tab_account">Λογαριασμός</string>
