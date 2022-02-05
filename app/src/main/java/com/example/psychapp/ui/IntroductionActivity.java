@@ -43,7 +43,7 @@ import java.util.Map;
 import static com.example.psychapp.applications.PsychApp.context;
 
 public class IntroductionActivity extends AppCompatActivity {
-    private final String DESCRIPTION = "Description";
+    public static final String DESCRIPTION = "Description";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

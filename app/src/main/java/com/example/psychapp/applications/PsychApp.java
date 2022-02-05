@@ -22,8 +22,8 @@ import com.example.psychapp.R;
 import java.util.Calendar;
 
 public class PsychApp extends Application {
-//    public static final String serverUrl = "http://153.92.221.7:5050/";
-    public static final String serverUrl = "http://192.168.1.4:5050/";
+    public static final String serverUrl = "http://153.92.221.7:5050/";
+//    public static final String serverUrl = "http://192.168.1.4:5050/";
 
     public static Context context;
     public static String CHANNEL_ID = "PsychAppNotifications";

@@ -53,6 +53,7 @@ import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import static com.example.psychapp.applications.PsychApp.context;
+import static com.example.psychapp.ui.IntroductionActivity.DESCRIPTION;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String USER_INFO = "User_info";
@@ -275,6 +276,7 @@ public class LoginActivity extends AppCompatActivity {
     public static void clearInfo(){
         user = null;
         context.deleteFile(USER_INFO);
+        context.deleteFile(DESCRIPTION);
     }
 
     public void setLocale(String language) {
