@@ -148,9 +148,8 @@ public class Settings_Notification_Fragment extends Fragment {
                         minutes.add(Integer.parseInt(radio.getText().toString().split(":")[1]));
                     }
 
-                    int d=0;
                     int total = 0;
-                    while(total < LoginActivity.user.getMaxProgress()){
+                    for (int d = 0; d < LoginActivity.user.getStudyLength() +1; d++) {
                         for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++) {
                             if(total < LoginActivity.user.getMaxProgress()) {
                                 Calendar calendar = Calendar.getInstance();
@@ -160,12 +159,10 @@ public class Settings_Notification_Fragment extends Fragment {
                                 calendar.add(Calendar.DATE, d);
 
                                 if(calendar.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
-                                    PsychApp.instance.scheduleNotificationAt(calendar.getTimeInMillis(), 2612 + total);
-                                    total++;
+                                    PsychApp.instance.scheduleNotificationAt(calendar.getTimeInMillis(), 2612 + total++);
                                 }
                             }
                         }
-                        d++;
                     }
                     getActivity().finish();
                 }
@@ -192,9 +189,8 @@ public class Settings_Notification_Fragment extends Fragment {
                     hours.add(datePicker.getHour());
                     minutes.add(datePicker.getMinute());
 
-                    int d=0;
                     int total = 0;
-                    while(total < LoginActivity.user.getMaxProgress()){
+                    for (int d = 0; d < LoginActivity.user.getStudyLength() +1; d++) {
                         for (int i = 0; i < LoginActivity.user.getTestsPerDay(); i++) {
                             if (total < LoginActivity.user.getMaxProgress()) {
                                 Calendar calendar = Calendar.getInstance();
@@ -203,11 +199,9 @@ public class Settings_Notification_Fragment extends Fragment {
                                 calendar.set(Calendar.MINUTE, minutes.get(0) * MINUTE_INTERVAL);
                                 calendar.add(Calendar.DATE, d);
 
-                                PsychApp.instance.scheduleNotificationAt(calendar.getTimeInMillis(), 2612 + total);
-                                total++;
+                                PsychApp.instance.scheduleNotificationAt(calendar.getTimeInMillis(), 2612 + total++);
                             }
                         }
-                        d++;
                     }
                     storeValues();
 

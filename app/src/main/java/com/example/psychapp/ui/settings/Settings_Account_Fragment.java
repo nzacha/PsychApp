@@ -123,15 +123,17 @@ public class Settings_Account_Fragment extends Fragment {
     private void stopResearch(final String reason){
         // Instantiate the RequestQueue.
         final RequestQueue queue = Volley.newRequestQueue(context);
-        String url = PsychApp.serverUrl + "users/" + LoginActivity.user.getUserId();
+        String url = PsychApp.serverUrl + "participant/status/" + LoginActivity.user.getUserId();
 
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.DELETE, url, null,
+        Map<String, String> params = new HashMap<>();
+        params.put("value", ""+false);
+        params.put("reasoning", ""+reason);
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.POST, url, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         PsychApp.clearNotifications();
                         QuestionnaireActivity.setEnabled(false);
-                        updateUserReason(LoginActivity.user.getUserId(), reason);
                         LoginActivity.clearInfo();
                         ExitActivity.exitApplication(getActivity());
                     }
@@ -141,30 +143,14 @@ public class Settings_Account_Fragment extends Fragment {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
                     }
-                });
-
-        // add it to the RequestQueue
-        queue.add(postRequest);
-    }
-
-    private void updateUserReason(int userId, String reason){
-        final RequestQueue queue = Volley.newRequestQueue(context);
-        String url = PsychApp.serverUrl + "users/" + userId;
-
-        Map<String, String> params = new HashMap<>();
-        params.put("reason", reason);
-        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.PATCH, url, new JSONObject(params),
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
-                    }
-                });
+                }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-access-token", LoginActivity.user.getToken());
+                return params;
+            }
+        };
 
         // add it to the RequestQueue
         queue.add(postRequest);

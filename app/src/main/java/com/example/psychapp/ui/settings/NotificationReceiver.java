@@ -212,7 +212,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Log.e("wtf", "An Error occurred: " + error.networkResponse.statusCode + ": " + error.networkResponse.data);
+                    if(error.networkResponse != null)
+                        Log.e("wtf", "An Error occurred: " + error.networkResponse.statusCode + ": " + error.networkResponse.data);
+                    else
+                        Log.e("wtf", "An Error occurred: " + error);
                 }
             }){
             @Override
