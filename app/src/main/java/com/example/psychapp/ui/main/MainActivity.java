@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        QuestionnaireActivity.setEnabled(true);
+//        QuestionnaireActivity.setEnabled(true);
 //        test();
     }
 
