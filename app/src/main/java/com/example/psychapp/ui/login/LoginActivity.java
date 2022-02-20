@@ -82,9 +82,7 @@ public class LoginActivity extends AppCompatActivity {
             Log.d("wtf","sending local answers");
             try {
                 QuestionnaireActivity.sendLocalAnswers();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

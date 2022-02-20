@@ -317,7 +317,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
             Log.d("wtf", "Answers loaded from Phone ("+answers.size()+")");
 
             for (Question question : answers) {
-                sendAnswerToServer(question, question.date);
+                try {
+                    sendAnswerToServer(question, question.date);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
             PsychApp.getContext().deleteFile(ANSWERS);
 
