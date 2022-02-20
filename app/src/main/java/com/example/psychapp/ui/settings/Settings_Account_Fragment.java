@@ -36,8 +36,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.psychapp.applications.PsychApp.context;
-
 public class Settings_Account_Fragment extends Fragment {
     private int STOP_BUTTON_DISABLED_COLOR =  Color.argb((int)(.4f * 255), 0 ,0, 0);
     private int STOP_BUTTON_ENABLED_COLOR = Color.argb((int)(.8f * 255), 0 ,0, 0);
@@ -112,8 +110,8 @@ public class Settings_Account_Fragment extends Fragment {
     }
 
     private void logout(){
-        context.deleteFile(QuestionnaireActivity.QUESTIONS);
-        context.deleteFile(QuestionnaireActivity.ANSWERS);
+        PsychApp.getContext().deleteFile(QuestionnaireActivity.QUESTIONS);
+        PsychApp.getContext().deleteFile(QuestionnaireActivity.ANSWERS);
         QuestionnaireActivity.setEnabled(false);
         LoginActivity.clearInfo();
         PsychApp.clearNotifications();
@@ -122,7 +120,7 @@ public class Settings_Account_Fragment extends Fragment {
 
     private void stopResearch(final String reason){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(context);
+        final RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "participant/status/" + LoginActivity.user.getUserId();
 
         Map<String, String> params = new HashMap<>();

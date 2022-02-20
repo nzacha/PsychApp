@@ -25,7 +25,7 @@ public class PsychApp extends Application {
     public static final String serverUrl = "http://153.92.221.7:5050/";
 //    public static final String serverUrl = "http://192.168.1.4:5050/";
 
-    public static Context context;
+    private static Application application;
     public static String CHANNEL_ID = "PsychAppNotifications";
     public static boolean DEBUG = true;
 
@@ -37,7 +37,7 @@ public class PsychApp extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        context = this;
+        application = this;
 
         createNotificationChannel();
     }
@@ -141,7 +141,7 @@ public class PsychApp extends Application {
     public static void clearNotifications(){
         NotificationManager notificationManager = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager = context.getSystemService(NotificationManager.class);
+            notificationManager = PsychApp.getContext().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(PsychApp.channel);
             notificationManager.cancelAll();
         }
@@ -149,9 +149,17 @@ public class PsychApp extends Application {
 
     public static void cancelAlarmNotifications(){
         for(int i=0; i<6; i++) {
-            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 2612+i, new Intent(context, NotificationReceiver.class), 0);
+            AlarmManager alarmManager = (AlarmManager) PsychApp.getContext().getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(PsychApp.getContext(), 2612+i, new Intent(getContext(), NotificationReceiver.class), 0);
             alarmManager.cancel(pendingIntent);
         }
+    }
+
+    public static Application getApplication(){
+        return application;
+    }
+
+    public static Context getContext(){
+        return getApplication().getApplicationContext();
     }
 }

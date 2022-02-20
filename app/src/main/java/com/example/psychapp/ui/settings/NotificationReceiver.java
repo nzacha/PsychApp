@@ -62,7 +62,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     }
 
     public void trackProgress(Context context, Intent intent) {
-        if (PsychApp.isNetworkConnected(PsychApp.context)) {
+        if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
             sendUserProgressUpdate();
         }
 
@@ -72,7 +72,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             if(QuestionnaireActivity.isActive()){
                 ArrayList<Section> sections = QuestionnaireActivity.sections;
                 Log.d("wtf", "Answers Missing");
-                if (PsychApp.isNetworkConnected(PsychApp.context)) {
+                if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
                     for(Section section: sections)
                         for(Question question: section.questions) {
                             final Question _question = question;
@@ -95,7 +95,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             }
 
             sendNotification(context, intent);
-            Toast.makeText(context.getApplicationContext(), PsychApp.context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
+            Toast.makeText(context.getApplicationContext(), PsychApp.getContext().getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             QuestionnaireActivity.setEnabled(true);
         } else {
             Log.d("wtf", "Notification suppressed");
@@ -194,7 +194,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     public static void sendUserProgressUpdate() {
         // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
+        RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "participant/" + LoginActivity.user.getUserId();
         Log.d("wtf", url);
 

@@ -36,11 +36,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.example.psychapp.applications.PsychApp.context;
 
 public class IntroductionActivity extends AppCompatActivity {
     public static final String DESCRIPTION = "Description";
@@ -102,7 +99,7 @@ public class IntroductionActivity extends AppCompatActivity {
     }
 
     private void loadDescriptionFromFile(TextView description, TextView name, TextView email, TextView phone) throws IOException, ClassNotFoundException {
-        FileInputStream fis = context.openFileInput(DESCRIPTION);
+        FileInputStream fis = PsychApp.getContext().openFileInput(DESCRIPTION);
         ObjectInputStream is = new ObjectInputStream(fis);
         String[] data = (String[]) is.readObject();
         description.setText(data[0]);
@@ -115,7 +112,7 @@ public class IntroductionActivity extends AppCompatActivity {
     }
 
     public void saveDescriptionLocally(String[] data) throws IOException {
-        FileOutputStream fos = context.openFileOutput(DESCRIPTION, Context.MODE_PRIVATE);
+        FileOutputStream fos = PsychApp.getContext().openFileOutput(DESCRIPTION, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
         os.writeObject(data);
         os.close();

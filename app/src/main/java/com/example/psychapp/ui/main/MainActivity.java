@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        QuestionnaireActivity.setEnabled(true);
-//        test();
+        QuestionnaireActivity.setEnabled(true);
+        test();
     }
 
     private void test(){
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendTest(boolean sendNotification){
         LoginActivity.progress();
-        if (PsychApp.isNetworkConnected(PsychApp.context)) {
+        if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
             NotificationReceiver.sendUserProgressUpdate();
         }
 
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             finishAffinity();
             return;
         }
-        Context context = PsychApp.context;
+        Context context = PsychApp.getContext();
         PsychApp.clearNotifications();
         Log.d("wtf", "Sending Notification");
 

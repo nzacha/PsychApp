@@ -52,7 +52,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
 
-import static com.example.psychapp.applications.PsychApp.context;
 import static com.example.psychapp.ui.IntroductionActivity.DESCRIPTION;
 
 public class LoginActivity extends AppCompatActivity {
@@ -79,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         //send local answers
-        if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(context)){
+        if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(PsychApp.getContext())){
             Log.d("wtf","sending local answers");
             try {
                 QuestionnaireActivity.sendLocalAnswers();
@@ -241,13 +240,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void updateUiWithUser(LoggedInUser model, boolean showConsent) {
         Log.d("wtf", "Login was successfull");
-        QuestionnaireActivity.retrieveQuestions(getApplicationContext(), model.getProjectId());
+        QuestionnaireActivity.retrieveQuestions(model.getProjectId());
 
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             if(extras.getBoolean("notification_origin")){
-                Intent newIntent = new Intent(context, QuestionnaireActivity.class);
-                TaskStackBuilder.create(PsychApp.context)
+                Intent newIntent = new Intent(PsychApp.getContext(), QuestionnaireActivity.class);
+                TaskStackBuilder.create(PsychApp.getContext())
                         .addNextIntentWithParentStack(newIntent)
                         .startActivities();
 
@@ -275,8 +274,8 @@ public class LoginActivity extends AppCompatActivity {
 
     public static void clearInfo(){
         user = null;
-        context.deleteFile(USER_INFO);
-        context.deleteFile(DESCRIPTION);
+        PsychApp.getContext().deleteFile(USER_INFO);
+        PsychApp.getContext().deleteFile(DESCRIPTION);
     }
 
     public void setLocale(String language) {
@@ -292,7 +291,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private static void saveUserInfo(LoggedInUser user) throws IOException {
-        FileOutputStream fos = PsychApp.context.openFileOutput(USER_INFO, Context.MODE_PRIVATE);
+        FileOutputStream fos = PsychApp.getContext().openFileOutput(USER_INFO, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
         os.writeObject(user);
         os.close();
@@ -322,10 +321,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public static void loadUserInfo() throws IOException, ClassNotFoundException {
-        File file = context.getFileStreamPath(USER_INFO);
+        File file = PsychApp.getContext().getFileStreamPath(USER_INFO);
         if(!file.exists())
             return;
-        FileInputStream fis = context.openFileInput(USER_INFO);
+        FileInputStream fis = PsychApp.getContext().openFileInput(USER_INFO);
         ObjectInputStream is = new ObjectInputStream(fis);
         user = (LoggedInUser) is.readObject();
         is.close();

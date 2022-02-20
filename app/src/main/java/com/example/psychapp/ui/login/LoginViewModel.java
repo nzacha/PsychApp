@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.psychapp.applications.PsychApp.context;
-
 public class LoginViewModel extends ViewModel {
     public static LoginViewModel instance;
 
@@ -51,7 +49,7 @@ public class LoginViewModel extends ViewModel {
 
     public void login() {
         // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(PsychApp.context);
+        RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "auth/participate";
         Log.i("wtf", url);
 

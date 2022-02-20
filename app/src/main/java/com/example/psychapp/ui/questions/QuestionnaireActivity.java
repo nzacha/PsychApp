@@ -3,22 +3,11 @@ package com.example.psychapp.ui.questions;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -29,7 +18,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.psychapp.ExitActivity;
-import com.example.psychapp.data.LoggedInUser;
 import com.example.psychapp.data.Question;
 import com.example.psychapp.data.Question.QuestionType;
 import com.example.psychapp.R;
@@ -52,13 +40,9 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.Map;
 
-import static com.example.psychapp.applications.PsychApp.context;
 
 public class QuestionnaireActivity extends AppCompatActivity {
     public static ArrayList<Section> sections = new ArrayList<Section>();
@@ -98,7 +82,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         sendAnswersButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if(PsychApp.isNetworkConnected(context)) {
+                if(PsychApp.isNetworkConnected(PsychApp.getContext())) {
                     for (Section section : sections) {
                         for (Question question : section.questions) {
                             Log.d("value", "sent to server: " + question.toString());
@@ -115,9 +99,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     }
                 }
                 clearQuestions();
-                retrieveQuestions(context, LoginActivity.user.getProjectId());
+                retrieveQuestions(LoginActivity.user.getProjectId());
                 PsychApp.clearNotifications();
-                ExitActivity.exitApplication(context);
+                ExitActivity.exitApplication(PsychApp.getContext());
             }
         });
 
@@ -137,7 +121,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
     public static void sendAnswerToServer(final Question question, Calendar date){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(context);
+        final RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "answer/";
         Log.d("info", url);
         
@@ -212,9 +196,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
         queue.add(postRequest);
     }
 
-    public static void retrieveQuestions(Context context, int projectId){
-        if(PsychApp.isNetworkConnected(context)){ // && !questionsExist()
-            retrieveQuestionsFromServer(context, projectId);
+    public static void retrieveQuestions(int projectId){
+        if(PsychApp.isNetworkConnected(PsychApp.getContext())){ // && !questionsExist()
+            retrieveQuestionsFromServer(projectId);
         } else {
             try {
                 loadQuestions();
@@ -227,13 +211,13 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     private static boolean questionsExist(){
-        File file = context.getFileStreamPath(QUESTIONS);
+        File file = PsychApp.getContext().getFileStreamPath(QUESTIONS);
         return file.exists();
     }
 
-    private static void retrieveQuestionsFromServer(final Context context, int projectId){
+    private static void retrieveQuestionsFromServer(int projectId){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(context);
+        final RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "project/quiz/" + projectId;
         Log.i("wtf", url);
         // prepare the Request
@@ -320,10 +304,10 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static void sendLocalAnswers() throws IOException, ClassNotFoundException {
-        File file = context.getFileStreamPath(ANSWERS);
+        File file = PsychApp.getContext().getFileStreamPath(ANSWERS);
         if(!file.exists())
             return;
-        FileInputStream fis = context.openFileInput(ANSWERS);
+        FileInputStream fis = PsychApp.getContext().openFileInput(ANSWERS);
         ObjectInputStream is = new ObjectInputStream(fis);
         ArrayList<Question> answers = (ArrayList<Question>) is.readObject();
         is.close();
@@ -335,7 +319,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             for (Question question : answers) {
                 sendAnswerToServer(question, question.date);
             }
-            context.deleteFile(ANSWERS);
+            PsychApp.getContext().deleteFile(ANSWERS);
 
             Log.d("wtf", "Local answers sent to server");
         }else{
@@ -348,7 +332,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         FileInputStream fis;
         ObjectInputStream is;
         if (answersExist()) {
-            fis = context.openFileInput(ANSWERS);
+            fis = PsychApp.getContext().openFileInput(ANSWERS);
             is = new ObjectInputStream(fis);
             answers = (ArrayList<Question>) is.readObject();
             is.close();
@@ -364,7 +348,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
             }
         }
         Log.d("wtf", "after: "+answers.size());
-        FileOutputStream fos = context.openFileOutput(ANSWERS, Context.MODE_PRIVATE);
+        FileOutputStream fos = PsychApp.getContext().openFileOutput(ANSWERS, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
         os.writeObject(answers);
         os.close();
@@ -373,13 +357,13 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static boolean answersExist(){
-        File file = context.getFileStreamPath(ANSWERS);
+        File file = PsychApp.getContext().getFileStreamPath(ANSWERS);
         if(file.exists()) return true;
         return false;
     }
 
     private static void saveQuestions() throws IOException {
-        FileOutputStream fos = context.openFileOutput(QUESTIONS, Context.MODE_PRIVATE);
+        FileOutputStream fos = PsychApp.getContext().openFileOutput(QUESTIONS, Context.MODE_PRIVATE);
         ObjectOutputStream os = new ObjectOutputStream(fos);
         os.writeObject(sections);
         os.close();
@@ -388,7 +372,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     private static void loadQuestions() throws IOException, ClassNotFoundException {
-        FileInputStream fis = context.openFileInput(QUESTIONS);
+        FileInputStream fis = PsychApp.getContext().openFileInput(QUESTIONS);
         ObjectInputStream is = new ObjectInputStream(fis);
         sections = (ArrayList<Section>) is.readObject();
         is.close();
@@ -404,14 +388,14 @@ public class QuestionnaireActivity extends AppCompatActivity {
             }
         }
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("status", false);
         editor.apply();
     }
 
     public static void setEnabled(boolean val){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("status", val);
         editor.commit();
@@ -419,7 +403,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static boolean isActive(){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("status", false);
     }
 
@@ -428,183 +412,183 @@ public class QuestionnaireActivity extends AppCompatActivity {
         int q_index = 0;
         int t_index = 0;
         for(Section section: sections) {
-            SectionView sectionView = new SectionView(PsychApp.context);
+            SectionView sectionView = new SectionView(PsychApp.getContext());
             sectionView.inflateInto(layout, section, s_index,  t_index++);
             for (Question question : section.questions) {
-                QuestionView questionView = new QuestionView(PsychApp.context);
+                QuestionView questionView = new QuestionView(PsychApp.getContext());
                 questionView.inflateInto(layout, question, s_index, q_index++, t_index++);
             }
             s_index++;
         }
     }
 
-    class QuizAdapter extends ArrayAdapter<Question>{
-        public QuizAdapter(@NonNull Context context, ArrayList<Question> questions) {
-            super(context, 0, questions);
-        }
-
-        @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent){
-            //This is a bad implementation but at least i only have to make one adapter :)
-
-            final Question question = getItem(position);
-
-            switch(question.type) {
-                case Text:
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question, parent, false);
-
-                    EditText answer = (EditText) convertView.findViewById(R.id.quiz_question_message);
-                    answer.addTextChangedListener(new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable editable) {
-                            question.answer = editable.toString();
-                        }
-                    });
-                    answer.setText(question.answer);
-                    break;
-                case Slider:
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider, parent, false);
-
-                    SeekBar bar = (SeekBar) convertView.findViewById(R.id.question_seekbar);
-                    bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                            question.answer = ""+i;
-                        }
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {
-                        }
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {
-                        }
-                    });
-                    bar.setMax(100);
-
-                    int progress;
-                    try {
-                        progress = Integer.parseInt(question.answer);
-                    } catch (NumberFormatException nfe){
-                        progress = 0;
-                    }
-                    bar.setProgress(progress);
-
-                    break;
-                case Slider_Discrete:
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
-
-                    SeekBar bar2 = (SeekBar) convertView.findViewById(R.id.question_seekbar);
-                    bar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                        @Override
-                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                            question.answer = ""+i;
-                        }
-                        @Override
-                        public void onStartTrackingTouch(SeekBar seekBar) {
-                        }
-                        @Override
-                        public void onStopTrackingTouch(SeekBar seekBar) {
-                        }
-                    });
-                    bar2.setMax(question.level-1);
-
-                    int progress2;
-                    try {
-                        progress2 = Integer.parseInt(question.answer);
-                    } catch (NumberFormatException nfe){
-                        progress2 = 0;
-                    }
-                    bar2.setProgress(progress2);
-                    break;
-                case Multiple_Choice:
-                case Multiple_Choice_Horizontal:
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
-
-                    RadioGroup radioGroup = (RadioGroup) convertView.findViewById(R.id.choice_group);
-                    if(question.type == QuestionType.Multiple_Choice_Horizontal)
-                        radioGroup.setOrientation(LinearLayout.HORIZONTAL);
-
-                    for(String option: question.options) {
-                        RadioButton button = new RadioButton(context);
-                        button.setText(option);
-                        if(question.type == QuestionType.Multiple_Choice_Horizontal) {
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-                            button.setLayoutParams(params);
-                        }
-                        radioGroup.addView(button);
-                    }
-
-                    if(question.requestReason) {
-                        RadioButton button = new RadioButton(context);
-                        button.setText(getString(R.string.request_other));
-                        if (question.type == QuestionType.Multiple_Choice_Horizontal) {
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-                            button.setLayoutParams(params);
-                        }
-                        radioGroup.addView(button);
-                    }
-
-                    final TextView reasoning = convertView.findViewById(R.id.reasoning_input);
-                    Log.d("questions", "question adapter before: "+question.answer);
-                    try {
-                        radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
-                        if (question.requestReason && Integer.parseInt(question.answer) == radioGroup.getChildCount()-1){
-                            reasoning.setVisibility(View.VISIBLE);
-                        } else {
-                            reasoning.setVisibility(View.GONE);
-                        }
-                    } catch (NumberFormatException nfe) {
-                        question.answer = "" + 0;
-                        radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
-                    }
-                    Log.d("questions", "question adapter after: "+question.answer);
-
-                    if(question.requestReason) {
-                        if (question.hint != null && !question.hint.equals(""))
-                            reasoning.setText(question.hint);
-                        reasoning.addTextChangedListener(new TextWatcher() {
-                            @Override
-                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            }
-                            @Override
-                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                            }
-                            @Override
-                            public void afterTextChanged(Editable editable) {
-                                question.hint = editable.toString();
-                            }
-                        });
-                    }
-
-                    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                            int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
-                            question.answer = ""+index;
-                            if (question.requestReason && index == radioGroup.getChildCount()-1){
-                                reasoning.setVisibility(View.VISIBLE);
-                            } else {
-                                reasoning.setVisibility(View.GONE);
-                            }
-                            notifyDataSetChanged();
-                            Log.d("questions", "check listener: "+index);
-                        }
-                    });
-                    break;
-                default:
-                    throw new InputMismatchException();
-            }
-
-            TextView title = (TextView) convertView.findViewById(R.id.quiz_question_title);
-            title.setText(question.question);
-            return convertView;
-        }
-    }
+//    class QuizAdapter extends ArrayAdapter<Question>{
+//        public QuizAdapter(@NonNull Context context, ArrayList<Question> questions) {
+//            super(context, 0, questions);
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, @NonNull ViewGroup parent){
+//            //This is a bad implementation but at least i only have to make one adapter :)
+//
+//            final Question question = getItem(position);
+//
+//            switch(question.type) {
+//                case Text:
+//                    convertView = LayoutInflater.from(PsychApp.getContext()).inflate(R.layout.quiz_question, parent, false);
+//
+//                    EditText answer = (EditText) convertView.findViewById(R.id.quiz_question_message);
+//                    answer.addTextChangedListener(new TextWatcher() {
+//                        @Override
+//                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                        }
+//
+//                        @Override
+//                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                        }
+//
+//                        @Override
+//                        public void afterTextChanged(Editable editable) {
+//                            question.answer = editable.toString();
+//                        }
+//                    });
+//                    answer.setText(question.answer);
+//                    break;
+//                case Slider:
+//                    convertView = LayoutInflater.from(PsychApp.getContext()).inflate(R.layout.quiz_question_slider, parent, false);
+//
+//                    SeekBar bar = (SeekBar) convertView.findViewById(R.id.question_seekbar);
+//                    bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//                        @Override
+//                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                            question.answer = ""+i;
+//                        }
+//                        @Override
+//                        public void onStartTrackingTouch(SeekBar seekBar) {
+//                        }
+//                        @Override
+//                        public void onStopTrackingTouch(SeekBar seekBar) {
+//                        }
+//                    });
+//                    bar.setMax(100);
+//
+//                    int progress;
+//                    try {
+//                        progress = Integer.parseInt(question.answer);
+//                    } catch (NumberFormatException nfe){
+//                        progress = 0;
+//                    }
+//                    bar.setProgress(progress);
+//
+//                    break;
+//                case Slider_Discrete:
+//                    convertView = LayoutInflater.from(PsychApp.getContext()).inflate(R.layout.quiz_question_slider_discrete, parent, false);
+//
+//                    SeekBar bar2 = (SeekBar) convertView.findViewById(R.id.question_seekbar);
+//                    bar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//                        @Override
+//                        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                            question.answer = ""+i;
+//                        }
+//                        @Override
+//                        public void onStartTrackingTouch(SeekBar seekBar) {
+//                        }
+//                        @Override
+//                        public void onStopTrackingTouch(SeekBar seekBar) {
+//                        }
+//                    });
+//                    bar2.setMax(question.level-1);
+//
+//                    int progress2;
+//                    try {
+//                        progress2 = Integer.parseInt(question.answer);
+//                    } catch (NumberFormatException nfe){
+//                        progress2 = 0;
+//                    }
+//                    bar2.setProgress(progress2);
+//                    break;
+//                case Multiple_Choice:
+//                case Multiple_Choice_Horizontal:
+//                    convertView = LayoutInflater.from(PsychApp.getContext()).inflate(R.layout.quiz_question_multiple_choice, parent, false);
+//
+//                    RadioGroup radioGroup = (RadioGroup) convertView.findViewById(R.id.choice_group);
+//                    if(question.type == QuestionType.Multiple_Choice_Horizontal)
+//                        radioGroup.setOrientation(LinearLayout.HORIZONTAL);
+//
+//                    for(String option: question.options) {
+//                        RadioButton button = new RadioButton(PsychApp.getContext());
+//                        button.setText(option);
+//                        if(question.type == QuestionType.Multiple_Choice_Horizontal) {
+//                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+//                            button.setLayoutParams(params);
+//                        }
+//                        radioGroup.addView(button);
+//                    }
+//
+//                    if(question.requestReason) {
+//                        RadioButton button = new RadioButton(PsychApp.getContext());
+//                        button.setText(getString(R.string.request_other));
+//                        if (question.type == QuestionType.Multiple_Choice_Horizontal) {
+//                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+//                            button.setLayoutParams(params);
+//                        }
+//                        radioGroup.addView(button);
+//                    }
+//
+//                    final TextView reasoning = convertView.findViewById(R.id.reasoning_input);
+//                    Log.d("questions", "question adapter before: "+question.answer);
+//                    try {
+//                        radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+//                        if (question.requestReason && Integer.parseInt(question.answer) == radioGroup.getChildCount()-1){
+//                            reasoning.setVisibility(View.VISIBLE);
+//                        } else {
+//                            reasoning.setVisibility(View.GONE);
+//                        }
+//                    } catch (NumberFormatException nfe) {
+//                        question.answer = "" + 0;
+//                        radioGroup.check(radioGroup.getChildAt(Integer.parseInt(question.answer)).getId());
+//                    }
+//                    Log.d("questions", "question adapter after: "+question.answer);
+//
+//                    if(question.requestReason) {
+//                        if (question.hint != null && !question.hint.equals(""))
+//                            reasoning.setText(question.hint);
+//                        reasoning.addTextChangedListener(new TextWatcher() {
+//                            @Override
+//                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                            }
+//                            @Override
+//                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+//                            }
+//                            @Override
+//                            public void afterTextChanged(Editable editable) {
+//                                question.hint = editable.toString();
+//                            }
+//                        });
+//                    }
+//
+//                    radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//                        @Override
+//                        public void onCheckedChanged(RadioGroup radioGroup, int i) {
+//                            int index = radioGroup.indexOfChild(radioGroup.findViewById(i));
+//                            question.answer = ""+index;
+//                            if (question.requestReason && index == radioGroup.getChildCount()-1){
+//                                reasoning.setVisibility(View.VISIBLE);
+//                            } else {
+//                                reasoning.setVisibility(View.GONE);
+//                            }
+//                            notifyDataSetChanged();
+//                            Log.d("questions", "check listener: "+index);
+//                        }
+//                    });
+//                    break;
+//                default:
+//                    throw new InputMismatchException();
+//            }
+//
+//            TextView title = (TextView) convertView.findViewById(R.id.quiz_question_title);
+//            title.setText(question.question);
+//            return convertView;
+//        }
+//    }
 }
