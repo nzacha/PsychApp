@@ -16,6 +16,8 @@ import android.provider.Settings;
 import android.util.Log;
 
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.example.psychapp.ui.settings.NotificationReceiver;
 import com.example.psychapp.R;
 
@@ -24,6 +26,7 @@ import java.util.Calendar;
 public class PsychApp extends Application {
     public static final String serverUrl = "http://153.92.221.7:5050/";
 //    public static final String serverUrl = "http://192.168.1.4:5050/";
+    public static RequestQueue queue = null;
 
     private static Application application;
     public static String CHANNEL_ID = "PsychAppNotifications";
@@ -39,6 +42,7 @@ public class PsychApp extends Application {
         instance = this;
         application = this;
 
+        if(queue == null) queue = Volley.newRequestQueue(PsychApp.getContext());
         createNotificationChannel();
     }
 

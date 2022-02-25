@@ -119,8 +119,6 @@ public class Settings_Account_Fragment extends Fragment {
     }
 
     private void stopResearch(final String reason){
-        // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "participant/status/" + LoginActivity.user.getUserId();
 
         Map<String, String> params = new HashMap<>();
@@ -151,6 +149,6 @@ public class Settings_Account_Fragment extends Fragment {
         };
 
         // add it to the RequestQueue
-        queue.add(postRequest);
+        PsychApp.queue.add(postRequest);
     }
 }

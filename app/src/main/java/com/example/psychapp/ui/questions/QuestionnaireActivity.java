@@ -121,7 +121,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
     public static void sendAnswerToServer(final Question question, Calendar date){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "answer/";
         Log.d("info", url);
         
@@ -193,7 +192,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         };
 
         // add it to the RequestQueue
-        queue.add(postRequest);
+        PsychApp.queue.add(postRequest);
     }
 
     public static void retrieveQuestions(int projectId){
@@ -217,7 +216,6 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
     private static void retrieveQuestionsFromServer(int projectId){
         // Instantiate the RequestQueue.
-        final RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "project/quiz/" + projectId;
         Log.i("wtf", url);
         // prepare the Request
@@ -300,7 +298,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 }
             };
         // add it to the RequestQueue
-        queue.add(request);
+        PsychApp.queue.add(request);
     }
 
     public static void sendLocalAnswers() throws IOException, ClassNotFoundException {
@@ -319,11 +317,11 @@ public class QuestionnaireActivity extends AppCompatActivity {
             for (Question question : answers) {
                 try {
                     sendAnswerToServer(question, question.date);
+                    PsychApp.getContext().deleteFile(ANSWERS);
                 }catch(Exception e){
                     e.printStackTrace();
                 }
             }
-            PsychApp.getContext().deleteFile(ANSWERS);
 
             Log.d("wtf", "Local answers sent to server");
         }else{

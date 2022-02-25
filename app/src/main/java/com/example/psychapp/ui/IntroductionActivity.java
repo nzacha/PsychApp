@@ -121,7 +121,6 @@ public class IntroductionActivity extends AppCompatActivity {
     }
 
     public void setDescriptionFromDB(final TextView description,final TextView name,final TextView email,final TextView phone) throws IOException {
-        final RequestQueue queue = Volley.newRequestQueue(this);
         String url = PsychApp.serverUrl + "project/"+ LoginActivity.user.getProjectId();
         Log.i("wtf", url);
 
@@ -177,6 +176,6 @@ public class IntroductionActivity extends AppCompatActivity {
         };
 
         // add it to the RequestQueue
-        queue.add(getRequest);
+        PsychApp.queue.add(getRequest);
     }
 }

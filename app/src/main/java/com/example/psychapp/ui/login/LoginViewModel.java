@@ -49,7 +49,6 @@ public class LoginViewModel extends ViewModel {
 
     public void login() {
         // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "auth/participate";
         Log.i("wtf", url);
 
@@ -104,7 +103,7 @@ public class LoginViewModel extends ViewModel {
         };
 
         // add it to the RequestQueue
-        queue.add(request);
+        PsychApp.queue.add(request);
     }
 
     public void authenticateResult(){

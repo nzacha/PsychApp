@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 sendTest(true);
             }
-        }, 3000);
+        }, 5000);
     }
 
     private void sendTest(boolean sendNotification){

@@ -194,7 +194,6 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     public static void sendUserProgressUpdate() {
         // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(PsychApp.getContext());
         String url = PsychApp.serverUrl + "participant/" + LoginActivity.user.getUserId();
         Log.d("wtf", url);
 
@@ -227,7 +226,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         };;
 
         // add it to the RequestQueue
-        queue.add(postRequest);
+        PsychApp.queue.add(postRequest);
     }
 
     public void startService(Context context) {
