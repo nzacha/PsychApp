@@ -2,16 +2,20 @@ package com.example.psychapp.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.psychapp.ExitActivity;
+import com.example.psychapp.applications.PsychApp;
 import com.example.psychapp.ui.IntroductionActivity;
+import com.example.psychapp.ui.login.LoginActivity;
 import com.example.psychapp.ui.questions.QuestionnaireActivity;
 import com.example.psychapp.R;
 import com.example.psychapp.ui.settings.SettingsTabbedActivity;
@@ -36,6 +40,9 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
+        EditText welcomeText = root.findViewById(R.id.welcome_text);
+        welcomeText.setText(PsychApp.getContext().getString(R.string.welcome_no_questionmark) + ' ' + LoginActivity.user.getCode() + "!");
+
         Button introduction = root.findViewById(R.id.introduction_button);
         introduction.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,7 +58,8 @@ public class MainActivityFragment extends Fragment {
                 openQuestionnaireActivity();
             }
         });
-        questionnaireButton.setEnabled(QuestionnaireActivity.isActive());
+        Log.d("isActive", "main isactive: " + QuestionnaireActivity.isActive(PsychApp.getContext()));
+        questionnaireButton.setEnabled(QuestionnaireActivity.isActive(PsychApp.getContext()));
 
         Button settingsButton = root.findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {

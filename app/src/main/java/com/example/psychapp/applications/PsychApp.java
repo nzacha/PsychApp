@@ -97,10 +97,10 @@ public class PsychApp extends Application {
         calendar.add(Calendar.MINUTE, 30);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent alarmIntent = new Intent(this, NotificationReceiver.class);
+        Intent alarmIntent = new Intent(PsychApp.getContext(), NotificationReceiver.class);
         alarmIntent.setAction("reminder");
         alarmIntent.putExtra("code", requestCode);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(PsychApp.getContext(), requestCode, alarmIntent, 0);
         if (Build.VERSION.SDK_INT < 23) {
             if (Build.VERSION.SDK_INT >= 19) {
                 if(System.currentTimeMillis()<calendar.getTimeInMillis())

@@ -1,5 +1,7 @@
 package com.example.psychapp.ui.settings;
 
+import static com.example.psychapp.ui.questions.QuestionnaireActivity.setEnabled;
+
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
@@ -51,10 +53,12 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
 
         if (intent.getAction().equals("alarm")) {
+            setEnabled(context, true);
+            Toast.makeText(context, context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             LoginActivity.progress();
-
             trackProgress(context, intent);
         } else if (intent.getAction().equals("reminder")) {
+            Toast.makeText(context, context.getString(R.string.notification_reminder), Toast.LENGTH_LONG).show();
             sendReminder(context, intent);
         } else {
             Log.d("wtf", "Intent action not recognized");
@@ -68,35 +72,31 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
-
-            if(QuestionnaireActivity.isActive()){
-                ArrayList<Section> sections = QuestionnaireActivity.sections;
-                Log.d("wtf", "Answers Missing");
-                if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
-                    for(Section section: sections)
-                        for(Question question: section.questions) {
-                            final Question _question = question;
-                            _question.missing = true;
-                            QuestionnaireActivity.sendAnswerToServer(_question, Calendar.getInstance());
-                        }
-                }else{
-                    for(Section section: sections)
-                        for(Question question: section.questions) {
-                            question.missing = true;
+            ArrayList<Section> sections = QuestionnaireActivity.sections;
+            Log.d("wtf", "Answers Missing");
+            if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
+                for(Section section: sections) {
+                    for (Question question : section.questions) {
+                        question.missing = true;
+                        question.date = Calendar.getInstance();
                     }
-                    try {
-                        QuestionnaireActivity.saveAnswers(sections);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    QuestionnaireActivity.sendAllAnswersToServer(section.questions, x->null);
+                }
+            }else{
+                for(Section section: sections)
+                    for(Question question: section.questions) {
+                        question.missing = true;
+                }
+                try {
+                    QuestionnaireActivity.saveAnswers(sections);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
             }
 
             sendNotification(context, intent);
-            Toast.makeText(context.getApplicationContext(), PsychApp.getContext().getString(R.string.notification_title), Toast.LENGTH_LONG).show();
-            QuestionnaireActivity.setEnabled(true);
         } else {
             Log.d("wtf", "Notification suppressed");
             sendDeactivationNotification(context, intent);
@@ -104,7 +104,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     }
 
     public void sendReminder(Context context, Intent intent) {
-        if (!QuestionnaireActivity.isActive()) {
+        if (!QuestionnaireActivity.isActive(PsychApp.getContext())) {
             Log.d("wtf", "Reminder suppressed");
             return;
         }
@@ -236,7 +236,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     public void sendDeactivationNotification(Context context, Intent intent) {
         PsychApp.clearNotifications();
-        QuestionnaireActivity.setEnabled(false);
+        setEnabled(false);
         LoginActivity.user.deactivate();
         LoginActivity.clearInfo();
         PsychApp.cancelAlarmNotifications();

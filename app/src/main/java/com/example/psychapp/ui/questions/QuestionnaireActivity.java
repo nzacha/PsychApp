@@ -2,12 +2,15 @@ package com.example.psychapp.ui.questions;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -37,11 +40,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 
 public class QuestionnaireActivity extends AppCompatActivity {
@@ -83,12 +88,20 @@ public class QuestionnaireActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(PsychApp.isNetworkConnected(PsychApp.getContext())) {
-                    for (Section section : sections) {
-                        for (Question question : section.questions) {
-                            Log.d("value", "sent to server: " + question.toString());
-                            sendAnswerToServer(question, Calendar.getInstance());
+                        for (Section section : sections) {
+                            for (Question question : section.questions) {
+                                Log.d("value", "sent to server: " + question.toString());
+                                question.date = Calendar.getInstance();
+                            }try{
+                                sendAllAnswersToServer(section.questions, x -> null);
+                            }catch(Exception e){
+                                try {
+                                    saveAnswers(sections);
+                                } catch (Exception err) {
+                                    err.printStackTrace();
+                                }
+                            }
                         }
-                    }
                 } else {
                     try {
                         saveAnswers(sections);
@@ -183,6 +196,107 @@ public class QuestionnaireActivity extends AppCompatActivity {
                     Log.d("wtf", "Answer: "+ finalAnswer + ", gave server response: "+error.toString());
                 }
             }){
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("x-access-token", LoginActivity.user.getToken());
+                return params;
+            }
+        };
+
+        // add it to the RequestQueue
+        PsychApp.queue.add(postRequest);
+    }
+
+    public static void sendAllAnswersToServer(final ArrayList<Question> questions, Function onSuccess){
+        // Instantiate the RequestQueue.
+        String url = PsychApp.serverUrl + "answer/multiple";
+        Log.d("answers", url);
+
+        final JSONObject payload = new JSONObject();
+        JSONArray questionsArray = new JSONArray();
+        for(Question question : questions){
+            JSONObject questionObject = new JSONObject();
+            String answer = question.answer;
+
+            if(question.missing){
+                answer = "No answer given";
+            }else {
+                switch (question.type) {
+                    case Slider:
+                    case Slider_Discrete:
+                        int temp;
+                        try {
+                            temp = Integer.parseInt(answer);
+                        } catch (NumberFormatException nfe) {
+                            temp = 0;
+                        }
+                        if (question.type == QuestionType.Slider_Discrete)
+                            temp++;
+                        answer = "" + (temp);
+                        break;
+                    case Multiple_Choice:
+                    case Multiple_Choice_Horizontal:
+                        int index;
+                        try {
+                            index = Integer.parseInt(answer);
+                            answer = question.options[index];
+                        } catch (NumberFormatException nfe) {
+                            answer = nfe.getMessage();
+                        } catch (ArrayIndexOutOfBoundsException nfe) {
+                            answer = question.hint;
+                        }
+                        break;
+                    case Text:
+                        if (answer == "")
+                            answer = "No answer given";
+                        break;
+                }
+            }
+
+            try {
+                questionObject.put("answer", "" + answer);
+                questionObject.put("index", "" + question.index);
+                SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                String formatted = simpledateformat.format(question.date.getTime());
+                questionObject.put("date", formatted);
+                questionObject.put("question_id", "" + question.id);
+                questionObject.put("participant_id", "" + question.userId);
+                questionsArray.put(questionObject);
+            }catch(Exception e){
+                Log.e("wtf", e.toString());
+            }
+        }
+        try {
+            payload.put("code", LoginActivity.user.getCode());
+            payload.put("questions", questionsArray);
+        }catch(Exception e){
+            Log.e("answers", e.toString());
+        }
+        JsonObjectRequest postRequest = new JsonObjectRequest(Request.Method.PUT, url, payload,
+                new Response.Listener<JSONObject>() {
+                    @RequiresApi(api = Build.VERSION_CODES.N)
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("answers", "Sent to server: " + payload.toString());
+                        final String message = "Sent " + questions.size() + " answers to the server!";
+                        Toast.makeText(PsychApp.getApplication().getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                        if(onSuccess != null) onSuccess.apply(null);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("answers", "server error response: "+error.toString());
+                        try {
+                            Log.e("answers", "error: " + new String(error.networkResponse.data,"UTF-8"));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        Log.e("answers", "error: "+error.networkResponse.statusCode);
+                        Toast.makeText(PsychApp.getApplication().getApplicationContext(), "An Error Ocurred: " + error.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }){
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<String, String>();
@@ -313,14 +427,10 @@ public class QuestionnaireActivity extends AppCompatActivity {
 
         if(answers.size() > 0) {
             Log.d("wtf", "Answers loaded from Phone ("+answers.size()+")");
-
-            for (Question question : answers) {
-                try {
-                    sendAnswerToServer(question, question.date);
-                    PsychApp.getContext().deleteFile(ANSWERS);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
+            try {
+                sendAllAnswersToServer(answers, (x) -> PsychApp.getContext().deleteFile(ANSWERS));
+            }catch(Exception e){
+                e.printStackTrace();
             }
 
             Log.d("wtf", "Local answers sent to server");
@@ -397,6 +507,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     }
 
     public static void setEnabled(boolean val){
+        Log.d("isActive", "setting active status to " + val);
         SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("status", val);
@@ -404,8 +515,17 @@ public class QuestionnaireActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    public static boolean isActive(){
-        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
+    public static void setEnabled(Context context, boolean val){
+        Log.d("isActive", "setting active status to " + val);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("status", val);
+        editor.commit();
+        editor.apply();
+    }
+
+    public static boolean isActive(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("status", false);
     }
 

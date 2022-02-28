@@ -1,5 +1,7 @@
 package com.example.psychapp.ui.main;
 
+import static com.example.psychapp.ui.questions.QuestionnaireActivity.setEnabled;
+
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
             NotificationReceiver.sendUserProgressUpdate();
         }
 
+
+        setEnabled(true);
         if(!sendNotification)
             return;
 

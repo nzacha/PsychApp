@@ -77,16 +77,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
 
-        //send local answers
-        if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(PsychApp.getContext())){
-            Log.d("wtf","sending local answers");
-            try {
-                QuestionnaireActivity.sendLocalAnswers();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
         try {
             loadUserInfo();
         } catch (IOException e) {
@@ -96,6 +86,15 @@ public class LoginActivity extends AppCompatActivity {
         }
         final boolean savedData = (user != null);
 
+        //send local answers
+        if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(PsychApp.getContext())){
+            Log.d("wtf","sending local answers");
+            try {
+                QuestionnaireActivity.sendLocalAnswers();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         //setLocale("el");
 
         final EditText codeEditText = findViewById(R.id.code_text);
@@ -323,6 +322,18 @@ public class LoginActivity extends AppCompatActivity {
         if(!file.exists())
             return;
         FileInputStream fis = PsychApp.getContext().openFileInput(USER_INFO);
+        ObjectInputStream is = new ObjectInputStream(fis);
+        user = (LoggedInUser) is.readObject();
+        is.close();
+        fis.close();
+        Log.d("wtf", "User info loaded from Phone");
+    }
+
+    public static void loadUserInfo(Context context) throws IOException, ClassNotFoundException {
+        File file = context.getFileStreamPath(USER_INFO);
+        if(!file.exists())
+            return;
+        FileInputStream fis = context.openFileInput(USER_INFO);
         ObjectInputStream is = new ObjectInputStream(fis);
         user = (LoggedInUser) is.readObject();
         is.close();
