@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 //        QuestionnaireActivity.setEnabled(true);
-        test();
+//        test();
     }
 
     private void test(){
