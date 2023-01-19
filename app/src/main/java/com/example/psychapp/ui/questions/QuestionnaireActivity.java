@@ -57,7 +57,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(LoginActivity.user == null){
+        if (LoginActivity.user == null) {
             try {
                 LoginActivity.loadUserInfo();
             } catch (IOException e) {
@@ -84,35 +84,28 @@ public class QuestionnaireActivity extends AppCompatActivity {
         });
 
         Button sendAnswersButton = (Button) findViewById(R.id.send_answers_button);
-        sendAnswersButton.setOnClickListener(new View.OnClickListener(){
+        sendAnswersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(PsychApp.isNetworkConnected(PsychApp.getContext())) {
-                        for (Section section : sections) {
-                            for (Question question : section.questions) {
-                                Log.d("value", "sent to server: " + question.toString());
-                                question.date = Calendar.getInstance();
-                            }try{
-                                sendAllAnswersToServer(section.questions, x -> null);
-                            }catch(Exception e){
-                                try {
-                                    saveAnswers(sections);
-                                } catch (Exception err) {
-                                    err.printStackTrace();
-                                }
-                            }
-                        }
-                } else {
+                try {
+                    saveAnswers(sections);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
                     try {
-                        saveAnswers(sections);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
+                        sendLocalAnswers();
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 clearQuestions();
-                retrieveQuestions(LoginActivity.user.getProjectId());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    retrieveQuestions(LoginActivity.user.getProjectId(), null);
+                }
                 PsychApp.clearNotifications();
                 ExitActivity.exitApplication(PsychApp.getContext());
             }
@@ -126,10 +119,12 @@ public class QuestionnaireActivity extends AppCompatActivity {
         */
 
         LinearLayout quizQuestionList = findViewById(R.id.quiz_question_layout);
-//        for(Section s: sections){
-//            Log.d("wtf", s.toString());
-//        }
-        populateList(quizQuestionList, sections);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            QuestionnaireActivity.retrieveQuestions(LoginActivity.user.getProjectId(), (x) -> {
+                populateList(quizQuestionList, sections);
+                return null;
+            });
+        }
     }
 
     public static void sendAnswerToServer(final Question question, Calendar date){
@@ -208,7 +203,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         PsychApp.queue.add(postRequest);
     }
 
-    public static void sendAllAnswersToServer(final ArrayList<Question> questions, Function onSuccess){
+    public static void sendAllAnswersToServer(final ArrayList<Question> questions, final Function onSuccess){
         // Instantiate the RequestQueue.
         String url = PsychApp.serverUrl + "answer/multiple";
         Log.d("answers", url);
@@ -309,9 +304,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
         PsychApp.queue.add(postRequest);
     }
 
-    public static void retrieveQuestions(int projectId){
+    public static void retrieveQuestions(int projectId, Function onFinish){
         if(PsychApp.isNetworkConnected(PsychApp.getContext())){ // && !questionsExist()
-            retrieveQuestionsFromServer(projectId);
+            retrieveQuestionsFromServer(projectId, onFinish);
         } else {
             try {
                 loadQuestions();
@@ -319,6 +314,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+            }
+            if(onFinish != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                onFinish.apply(null);
             }
         }
     }
@@ -328,7 +326,7 @@ public class QuestionnaireActivity extends AppCompatActivity {
         return file.exists();
     }
 
-    private static void retrieveQuestionsFromServer(int projectId){
+    private static void retrieveQuestionsFromServer(int projectId, Function callback){
         // Instantiate the RequestQueue.
         String url = PsychApp.serverUrl + "project/quiz/" + projectId;
         Log.i("wtf", url);
@@ -395,6 +393,9 @@ public class QuestionnaireActivity extends AppCompatActivity {
                         Log.d("wtf","Retrieved questions from server");
                     } catch (JSONException e) {
                         Log.e("wtf", e.getMessage());
+                    }
+                    if(callback!=null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        callback.apply(null);
                     }
                 }
             },

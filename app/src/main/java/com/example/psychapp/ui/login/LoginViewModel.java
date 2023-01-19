@@ -94,7 +94,8 @@ public class LoginViewModel extends ViewModel {
                             res = new Result.Error(new Exceptions.InvalidCredentials());
                             break;
                         default:
-                            Log.d("wtf",error.networkResponse.statusCode+": "+error.networkResponse.data);
+                            if(error.networkResponse != null)
+                                Log.d("wtf",error.networkResponse.statusCode+": "+error.networkResponse.data);
                             res = new Result.Error(new Exception());
                     }
                     authenticateResult();

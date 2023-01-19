@@ -72,29 +72,29 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
-            ArrayList<Section> sections = QuestionnaireActivity.sections;
-            Log.d("wtf", "Answers Missing");
-            if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
-                for(Section section: sections) {
-                    for (Question question : section.questions) {
-                        question.missing = true;
-                        question.date = Calendar.getInstance();
-                    }
-                    QuestionnaireActivity.sendAllAnswersToServer(section.questions, x->null);
-                }
-            }else{
-                for(Section section: sections)
-                    for(Question question: section.questions) {
-                        question.missing = true;
-                }
-                try {
-                    QuestionnaireActivity.saveAnswers(sections);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
+//            ArrayList<Section> sections = QuestionnaireActivity.sections;
+//            Log.d("wtf", "Answers Missing");
+//            if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
+//                for(Section section: sections) {
+//                    for (Question question : section.questions) {
+//                        question.missing = true;
+//                        question.date = Calendar.getInstance();
+//                    }
+//                    QuestionnaireActivity.sendAllAnswersToServer(section.questions, x->null);
+//                }
+//            }else{
+//                for(Section section: sections)
+//                    for(Question question: section.questions) {
+//                        question.missing = true;
+//                }
+//                try {
+//                    QuestionnaireActivity.saveAnswers(sections);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (ClassNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
             sendNotification(context, intent);
         } else {

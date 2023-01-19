@@ -133,7 +133,7 @@ public class QuestionView extends View{
                 if(question.type == Question.QuestionType.Multiple_Choice_Horizontal)
                     radioGroup.setOrientation(LinearLayout.HORIZONTAL);
 
-                for(int i=question.options.length-1; i>=0; i--){
+                for(int i=0; i<question.options.length; i++){
                     RadioButton button = new RadioButton(context);
                     button.setText(question.options[i]);
                     if(question.type == Question.QuestionType.Multiple_Choice_Horizontal) {
