@@ -87,12 +87,14 @@ public class LoginActivity extends AppCompatActivity {
         final boolean savedData = (user != null);
 
         //send local answers
-        if(QuestionnaireActivity.answersExist() && PsychApp.isNetworkConnected(PsychApp.getContext())){
-            Log.d("wtf","sending local answers");
-            try {
-                QuestionnaireActivity.sendLocalAnswers();
-            } catch (Exception e) {
-                e.printStackTrace();
+        if(PsychApp.isNetworkConnected(PsychApp.getContext())){
+            if(QuestionnaireActivity.answersExist()){
+                Log.d("wtf","sending local answers");
+                try {
+                    QuestionnaireActivity.sendLocalAnswers();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         //setLocale("el");
@@ -125,6 +127,9 @@ public class LoginActivity extends AppCompatActivity {
                         user = new LoggedInUser(user.getUserId(), user.getDisplayName(), newData.getProjectId(), newData.getStudyLength(), newData.getTestsPerDay(), newData.getTestsTimeInterval(), newData.getAllowIndividualTimes(), newData.getAllowUserTermination(), newData.getAutomaticTermination(), user.getProgress(), user.getCode(), newData.isActive(), user.getToken());
                     } else {
                         user = loginResult.getSuccess();
+                    }
+                    if(PsychApp.isNetworkConnected(PsychApp.getContext())){
+                        QuestionnaireActivity.retrieveQuestions(user.getProjectId(), null);
                     }
                     PsychApp.clearNotifications();
                     try {
