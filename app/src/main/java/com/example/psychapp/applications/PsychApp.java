@@ -28,7 +28,8 @@ public class PsychApp extends Application {
 //    public static final String serverUrl = "http://192.168.1.4:5050/";
     public static RequestQueue queue = null;
 
-    private static Application application;
+    private static Application application = null;
+    private static Context context = null;
     public static String CHANNEL_ID = "PsychAppNotifications";
     public static boolean DEBUG = true;
 
@@ -41,6 +42,7 @@ public class PsychApp extends Application {
         super.onCreate();
         instance = this;
         application = this;
+        context = this;
 
         if(queue == null) queue = Volley.newRequestQueue(PsychApp.getContext());
         createNotificationChannel();
@@ -160,10 +162,16 @@ public class PsychApp extends Application {
     }
 
     public static Application getApplication(){
+        if(application == null){
+            Log.e("wtf", "Application is null!!!");
+        }
         return application;
     }
 
     public static Context getContext(){
-        return getApplication().getApplicationContext();
+        if(context == null){
+            Log.e("wtf", "Context is null!!!");
+        }
+        return context;
     }
 }

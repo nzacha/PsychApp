@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -36,6 +37,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -46,12 +48,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 
 public class QuestionnaireActivity extends AppCompatActivity {
     public static ArrayList<Section> sections = new ArrayList<Section>();
-    public static final String QUESTIONNAIRE_STATE = "Questionnaire_State", QUESTIONS = "Questions", ANSWERS = "Answers";
+    public static final String QUESTIONNAIRE_STATE = "com.example.psychapp.Questionnaire_State", QUESTIONS = "com.example.psychapp.Questions", ANSWERS = "com.example.psychapp.Answers", STATUS = "questionnaire_status";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -501,33 +504,55 @@ public class QuestionnaireActivity extends AppCompatActivity {
             }
         }
 
-        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("status", false);
-        editor.apply();
+        setEnabled(false);
     }
 
     public static void setEnabled(boolean val){
-        Log.d("isActive", "setting active status to " + val);
-        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("status", val);
-        editor.commit();
-        editor.apply();
+        Log.d("wtf", "setting active status to " + val);
+        try {
+            FileOutputStream fos = PsychApp.getContext().openFileOutput(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(""+val);
+            os.close();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+//        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.clear();
+//        editor.putBoolean(STATUS, val);
+//        boolean error = editor.commit();
+//        if(!error){
+//            Log.e("wtf", "SharedPrefs commit error");
+//        }
     }
 
-    public static void setEnabled(Context context, boolean val){
-        Log.d("isActive", "setting active status to " + val);
-        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("status", val);
-        editor.commit();
-        editor.apply();
-    }
+    public static boolean isActive() {
+        try {
+            FileInputStream fis = PsychApp.getContext().openFileInput(QUESTIONNAIRE_STATE);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            String data = (String) is.readObject();
+            if(data.equals("true")) {
+                Log.d("wtf", "state: enabled" );
+                return true;
+            }
+            Log.d("wtf", "state: disabled" );
+            return false;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
-    public static boolean isActive(Context context){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
-        return sharedPreferences.getBoolean("status", false);
+//        SharedPreferences sharedPreferences = PsychApp.getContext().getSharedPreferences(QUESTIONNAIRE_STATE, Context.MODE_PRIVATE);
+//        Log.d("wtf", "isActive: " + sharedPreferences.contains(STATUS) + ", " + sharedPreferences.getBoolean(STATUS, false));
+//        return sharedPreferences.getBoolean(STATUS, false);
     }
 
     private void populateList(LinearLayout layout, ArrayList<Section> sections){

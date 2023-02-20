@@ -2,6 +2,7 @@ package com.example.psychapp.ui.settings;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +36,9 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.example.psychapp.ui.questions.QuestionnaireActivity.QUESTIONNAIRE_STATE;
+import static com.example.psychapp.ui.questions.QuestionnaireActivity.setEnabled;
 
 public class Settings_Account_Fragment extends Fragment {
     private int STOP_BUTTON_DISABLED_COLOR =  Color.argb((int)(.4f * 255), 0 ,0, 0);
@@ -112,7 +116,7 @@ public class Settings_Account_Fragment extends Fragment {
     private void logout(){
         PsychApp.getContext().deleteFile(QuestionnaireActivity.QUESTIONS);
         PsychApp.getContext().deleteFile(QuestionnaireActivity.ANSWERS);
-        QuestionnaireActivity.setEnabled(false);
+        setEnabled(false);
         LoginActivity.clearInfo();
         PsychApp.clearNotifications();
         ExitActivity.exitApplication(getActivity());
@@ -129,7 +133,7 @@ public class Settings_Account_Fragment extends Fragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         PsychApp.clearNotifications();
-                        QuestionnaireActivity.setEnabled(false);
+                        setEnabled(false);
                         LoginActivity.clearInfo();
                         ExitActivity.exitApplication(getActivity());
                     }

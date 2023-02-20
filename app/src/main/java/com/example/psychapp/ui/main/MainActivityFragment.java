@@ -1,5 +1,6 @@
 package com.example.psychapp.ui.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,8 +59,6 @@ public class MainActivityFragment extends Fragment {
                 openQuestionnaireActivity();
             }
         });
-        Log.d("isActive", "main isactive: " + QuestionnaireActivity.isActive(PsychApp.getContext()));
-        questionnaireButton.setEnabled(QuestionnaireActivity.isActive(PsychApp.getContext()));
 
         Button settingsButton = root.findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +77,12 @@ public class MainActivityFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        questionnaireButton.setEnabled(QuestionnaireActivity.isActive());
     }
 
     public void openIntroductionActivity(){

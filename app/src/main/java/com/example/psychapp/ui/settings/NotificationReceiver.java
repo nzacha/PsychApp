@@ -53,11 +53,12 @@ public class NotificationReceiver extends BroadcastReceiver {
         }
 
         if (intent.getAction().equals("alarm")) {
-            setEnabled(context, true);
+            Log.d("wtf", "alarm notification received");
             Toast.makeText(context, context.getString(R.string.notification_title), Toast.LENGTH_LONG).show();
             LoginActivity.progress();
             trackProgress(context, intent);
         } else if (intent.getAction().equals("reminder")) {
+            Log.d("wtf", "reminder notification received");
             Toast.makeText(context, context.getString(R.string.notification_reminder), Toast.LENGTH_LONG).show();
             sendReminder(context, intent);
         } else {
@@ -72,30 +73,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Log.d("wtf", "automatic termination is: "+ LoginActivity.user.getAutomaticTermination());
         if (LoginActivity.user.isActive() && (LoginActivity.user.getAutomaticTermination() ? LoginActivity.user.getProgress() <= LoginActivity.user.getMaxProgress() : true)) {
-//            ArrayList<Section> sections = QuestionnaireActivity.sections;
-//            Log.d("wtf", "Answers Missing");
-//            if (PsychApp.isNetworkConnected(PsychApp.getContext())) {
-//                for(Section section: sections) {
-//                    for (Question question : section.questions) {
-//                        question.missing = true;
-//                        question.date = Calendar.getInstance();
-//                    }
-//                    QuestionnaireActivity.sendAllAnswersToServer(section.questions, x->null);
-//                }
-//            }else{
-//                for(Section section: sections)
-//                    for(Question question: section.questions) {
-//                        question.missing = true;
-//                }
-//                try {
-//                    QuestionnaireActivity.saveAnswers(sections);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (ClassNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-
+            setEnabled(true);
             sendNotification(context, intent);
         } else {
             Log.d("wtf", "Notification suppressed");
@@ -104,7 +82,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     }
 
     public void sendReminder(Context context, Intent intent) {
-        if (!QuestionnaireActivity.isActive(PsychApp.getContext())) {
+        if (!QuestionnaireActivity.isActive()) {
             Log.d("wtf", "Reminder suppressed");
             return;
         }

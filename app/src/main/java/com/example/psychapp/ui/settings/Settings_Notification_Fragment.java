@@ -76,7 +76,7 @@ public class Settings_Notification_Fragment extends Fragment {
             }
         });
 
-        Log.d("wtf", ""+LoginActivity.user.getTestsPerDay());
+        Log.d("wtf", "test per day: "+LoginActivity.user.getTestsPerDay());
         if (LoginActivity.user.getTestsPerDay() > 1  && LoginActivity.user.getAllowIndividualTimes()) {
             notificationLabel.setText(R.string.notification_time_interval);
             String modifiedReminderText = notificationLabel.getText().toString();
@@ -233,6 +233,6 @@ public class Settings_Notification_Fragment extends Fragment {
             editor.putInt("hour_value_" + i, hours.get(i));
             editor.putInt("minute_value_" + i, minutes.get(i));
         }
-        editor.apply();
+        editor.commit();
     }
 }
